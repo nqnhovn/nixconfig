@@ -14,11 +14,15 @@
 
   outputs = { self, nixpkgs, home-manager, ... }@inputs: {
     nixosConfigurations = {
-      # "nixos" chính là hostname của máy anh
-      nixos = nixpkgs.lib.nixosSystem {
+      # Tên cấu hình 'lg' khớp với lệnh build anh đang sử dụng
+      lg = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        
+        # Truyền inputs vào trong các module để có thể sử dụng (nếu cần)
         specialArgs = { inherit inputs; };
+        
         modules = [
+          # Import các file cấu hình hệ thống
           ./hardware-configuration.nix
           ./configuration.nix
           
@@ -27,7 +31,9 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.nqnhovn = import ./home.nix; # Tách riêng file home.nix cho gọn
+            
+            # Khai báo cấu hình cá nhân cho user nqnhovn
+            home-manager.users.nqnhovn = import ./home.nix;
           }
         ];
       };

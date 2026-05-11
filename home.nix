@@ -3,6 +3,20 @@
 {
   home.stateVersion = "25.11";
 
+  # Cấu hình Git (Cú pháp mới theo nhánh unstable)
+  programs.git = {
+    enable = true;
+    settings = {
+      user = {
+        name = "nqnhovn";
+        email = "nqnho.vn@gmail.com";
+      };
+      init = {
+        defaultBranch = "main";
+      };
+    };
+  };
+
   # Cấu hình Zed Editor cho lập trình
   xdg.configFile."zed/settings.json".text = ''
     {
@@ -18,15 +32,6 @@
     }
   '';
 
-# Cấu hình Git
-  programs.git = {
-    enable = true;
-    userName = "nqnhovn";
-    userEmail = "nqnho.vn@gmail.com";
-    extraConfig = {
-      init.defaultBranch = "main";
-    };
-  };
   # GNOME Fractional Scaling và Extensions
   dconf.settings = {
     "org/gnome/mutter" = {
