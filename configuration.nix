@@ -24,20 +24,16 @@
   # Cho phép cài đặt các phần mềm không mã nguồn mở (như driver NVIDIA)
   nixpkgs.config.allowUnfree = true;
 
+  # 📦 Gói hệ thống — chỉ giữ những gì cần cho toàn bộ OS
+  #    Ứng dụng cá nhân → chuyển sang home.packages trong home.nix
   environment.systemPackages = with pkgs; [
-    # Công cụ Terminal cơ bản
-    wget git fzf ripgrep gnumake btop pciutils usbutils
-    # Dev environment manager (không cài PHP/Go/Node ở đây — dùng devbox + direnv)
-    devbox direnv starship vim zed-editor zoxide
-    # Containerization & Distrobox
-    podman-compose podman-tui distrobox
-    # Python (AI Agent scripts) + Zsh completions bổ sung
+    # Công cụ CLI thiết yếu
+    wget git fzf ripgrep gnumake pciutils usbutils
+    # Python cho AI Agent scripts
     python3
     # Zsh completions
     zsh-completions
-    # Trình duyệt mặc định
-    firefox
-    # Tiện ích giao diện GNOME
+    # GNOME Extensions (cần system-wide để hoạt động)
     gnomeExtensions.caffeine gnomeExtensions.appindicator
   ];
 
@@ -173,7 +169,7 @@
   boot.initrd.systemd = {
     enable = true;
     emergencyAccess = false;
-    enableTpm2 = false;
+    tpm2.enable = false;
   };
 
   # Plymouth splash — không chữ, chỉ logo LG
