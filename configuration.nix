@@ -1,10 +1,19 @@
+# =====================================================================
+# CONFIGURATION.NIX - TỐI ƯU CHO LG GRAM 17 (17U70N)
+# Phiên bản: NixOS 25.11 (Xantusia)
+# =====================================================================
+
 { config, pkgs, ... }:
 
 {
-  imports = [];
+  imports = []; # Cấu hình được quản lý thông qua Flake (flake.nix)
 
+  # Kích hoạt các tính năng thử nghiệm cần thiết cho Flake
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # =====================================================================
+  # 1. NGƯỜI DÙNG & GÓI PHẦN MỀM HỆ THỐNG
+  # =====================================================================
   users.users.nqnhovn = {
     isNormalUser = true;
     description = "Nguyen Quoc Nho";
@@ -12,31 +21,32 @@
     shell = pkgs.zsh;
   };
 
+  # Cho phép cài đặt các phần mềm không mã nguồn mở (như driver NVIDIA)
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    wget git fzf ripgrep gnumake btop
-    devbox direnv
-    starship vim zed-editor
+    # Công cụ Terminal cơ bản
+    wget git fzf ripgrep gnumake btop pciutils usbutils
+    # Phát triển phần mềm
+    devbox direnv starship vim zed-editor
+    # Containerization
     podman-compose podman-tui
+    # Trình duyệt mặc định
+    firefox 
+    # Tiện ích giao diện GNOME
     gnomeExtensions.caffeine gnomeExtensions.appindicator
   ];
 
-  # =====================================================================
-  # GỠ BỎ ỨNG DỤNG MẶC ĐỊNH KHÔNG CẦN THIẾT
-  # =====================================================================
+  # Gỡ bỏ các ứng dụng GNOME mặc định không dùng tới để nhẹ máy
   environment.gnome.excludePackages = with pkgs; [
-    gnome-tour
-    epiphany # Trình duyệt web mặc định của GNOME
-    geary    # Ứng dụng email
-    totem    # Trình xem video
-    gnome-music
-    gnome-characters
-    gnome-contacts
-    gnome-weather
-    tali iagno hitori atomix # Các game mặc định
+    gnome-tour epiphany geary totem gnome-music
+    gnome-characters gnome-contacts gnome-weather
+    tali iagno hitori atomix
   ];
 
+  # =====================================================================
+  # 2. VỎ LỆNH (SHELL) & BIẾN MÔI TRƯỜNG
+  # =====================================================================
   programs.zsh = {
     enable = true;
     ohMyZsh = {
@@ -47,8 +57,12 @@
     syntaxHighlighting.enable = true;
     shellAliases = {
       ll = "ls -alF"; la = "ls -A"; l = "ls -CF";
-      update = "sudo nixos-rebuild switch --flake ~/.config/nixos/#lg";
-      clean = "sudo nix-collect-garbage -d";
+# Sử dụng: build "Fix-Unikey"
+  build = "f() { sudo NIXOS_LABEL=\"$1\" nixos-rebuild switch --flake ~/.config/nixos/#lg; }; f";
+  
+  # Giữ lại các alias cũ
+  update = "sudo nixos-rebuild switch --flake ~/.config/nixos/#lg";
+  clean = "sudo nix-collect-garbage -d";
       dco = "podman-compose"; d = "podman"; v = "vim";
     };
   };
@@ -60,61 +74,55 @@
 
   programs.starship.enable = true;
 
-  virtualisation.containers.enable = true;
+  # Hỗ trợ chạy Docker thông qua Podman
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
     defaultNetwork.settings.dns_enabled = true;
   };
 
+  # =====================================================================
+  # 3. HỆ THỐNG CỐT LÕI & NGỦ ĐÔNG (HIBERNATE)
+  # =====================================================================
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-# =====================================================================
-  # CẤU HÌNH NGỦ ĐÔNG (HIBERNATE) VÀ SWAP
-  # =====================================================================
-  
-  # Khai báo UUID của phân vùng Swap để hệ thống biết nơi lấy dữ liệu khi thức dậy
+  # UUID phân vùng Swap (Chuẩn xác cho máy anh để kích hoạt Hibernate)
   boot.resumeDevice = "/dev/disk/by-uuid/4b931d72-02dd-4925-b788-042205a0e393";
 
-  # =====================================================================
- # =====================================================================
-  # THIẾT LẬP NGỦ ĐÔNG (CẬP NHẬT CHO NIXOS 25.11)
-  # =====================================================================
-  
+  # Cơ chế bảo vệ pin: Suspend (ngủ tạm) rồi tự động Hibernate (ngủ đông)
   services.logind.lidSwitch = "suspend-then-hibernate";
-  
-  # Cấu trúc mới thay thế cho extraConfig
   systemd.sleep.settings.Sleep = {
-    HibernateDelaySec = "30min";
+    HibernateDelaySec = "30min"; # Sau 30 phút Sleep sẽ tự động tắt máy vào Hibernate
   };
-  
+
   networking.hostName = "lg";
   networking.networkmanager.enable = true;
 
   time.timeZone = "Asia/Ho_Chi_Minh";
   i18n.defaultLocale = "en_US.UTF-8";
 
+  # Bộ gõ tiếng Việt Fcitx5 (Unikey) - Đã sửa lỗi cho NixOS 25.11
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
     fcitx5.addons = with pkgs; [ 
       qt6Packages.fcitx5-unikey 
       fcitx5-table-extra 
-      fcitx5-gtk 
+      fcitx5-gtk
     ];
     fcitx5.waylandFrontend = true;
   };
 
+  # Giao diện GNOME & Wayland
   services.xserver.enable = true;
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
   services.xserver.xkb.layout = "us";
-
-  environment.sessionVariables = { NIXOS_OZONE_WL = "1"; };
+  environment.sessionVariables = { NIXOS_OZONE_WL = "1"; }; # Giúp các app như Chrome/Zed chạy mượt trên Wayland
 
   # =====================================================================
-  # CẤU HÌNH ĐỒ HỌA & TỐI ƯU PIN (NVIDIA + TLP)
+  # 4. ĐỒ HỌA NVIDIA & TỐI ƯU PIN (TLP)
   # =====================================================================
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.graphics.enable = true;
@@ -124,47 +132,43 @@
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     
-    # Bật quản lý năng lượng Fine-grained để tắt hoàn toàn GPU khi không dùng
+    # Tiết kiệm điện: Tắt GPU NVIDIA hoàn toàn khi không xử lý nặng
     powerManagement.enable = true;
-    powerManagement.finegrained = true; 
+    powerManagement.finegrained = true;
 
     prime = {
       offload.enable = true;
       offload.enableOffloadCmd = true;
-      intelBusId = "PCI:0:2:0";  
-      nvidiaBusId = "PCI:2:0:0"; 
+      # PCI Bus ID chuẩn của máy LG Gram 17
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:2:0:0";
     };
   };
 
-  # Vô hiệu hóa trình quản lý pin mặc định của GNOME để tránh xung đột với TLP
+  # Tắt trình quản lý mặc định của GNOME để dùng TLP chuyên sâu
   services.power-profiles-daemon.enable = false;
 
-  # Kích hoạt TLP quản lý pin chuyên sâu
+  # Tối ưu hóa Pin chuyên sâu cho Laptop
   services.tlp = {
     enable = true;
     settings = {
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
       CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
       
-      # Giới hạn mức độ tiêu thụ CPU khi dùng pin (để máy luôn mát mẻ)
-      CPU_MIN_PERF_ON_AC = 0;
-      CPU_MAX_PERF_ON_AC = 100;
-      CPU_MIN_PERF_ON_BAT = 0;
-      CPU_MAX_PERF_ON_BAT = 70; # Khống chế xung nhịp tối đa ở mức 70% khi rút sạc
+      # Giới hạn hiệu năng CPU tối đa 70% khi rút sạc để máy luôn mát và bền pin
+      CPU_MAX_PERF_ON_BAT = 70; 
 
-      # Tối ưu hóa cổng kết nối
+      # Tự động quản lý năng lượng các cổng kết nối ngoại vi
       RUNTIME_PM_ON_BAT = "auto";
     };
   };
 
-  # Quản lý nhiệt độ CPU Intel và tự động điều chỉnh các thiết bị ngoại vi
   services.thermald.enable = true;
   powerManagement.powertop.enable = true;
 
   # =====================================================================
-  # SOUND & PRINTING
+  # 5. ÂM THANH & DỊCH VỤ KHÁC
   # =====================================================================
   services.printing.enable = true;
   services.pulseaudio.enable = false;
@@ -176,5 +180,5 @@
     pulse.enable = true;
   };
 
-  system.stateVersion = "25.11";
+  system.stateVersion = "25.11"; # Phiên bản NixOS khởi tạo của hệ thống
 }
