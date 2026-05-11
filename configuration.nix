@@ -27,12 +27,16 @@
   environment.systemPackages = with pkgs; [
     # Công cụ Terminal cơ bản
     wget git fzf ripgrep gnumake btop pciutils usbutils
-    # Phát triển phần mềm
-    devbox direnv starship vim zed-editor
-    # Containerization
-    podman-compose podman-tui
+    # Dev environment manager (không cài PHP/Go/Node ở đây — dùng devbox + direnv)
+    devbox direnv starship vim zed-editor zoxide
+    # Containerization & Distrobox
+    podman-compose podman-tui distrobox
+    # Python (AI Agent scripts) + Zsh completions bổ sung
+    python3
+    # Zsh completions
+    zsh-completions
     # Trình duyệt mặc định
-    firefox 
+    firefox
     # Tiện ích giao diện GNOME
     gnomeExtensions.caffeine gnomeExtensions.appindicator
   ];
@@ -49,23 +53,101 @@
   # =====================================================================
   programs.zsh = {
     enable = true;
-    ohMyZsh = {
-      enable = true;
-      plugins = [ "git" "sudo" "docker" "fzf" ];
-    };
+
+    # ── Không dùng oh-my-zsh để tránh lỗi cache ──
+    # Mọi tính năng được thay thế bằng native Zsh + plugin riêng
+
     autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
+
+    histSize = 10000;
+    setOptions = [
+      "HIST_IGNORE_DUPS"
+      "SHARE_HISTORY"
+      "HIST_FIND_NO_DUPS"
+      "HIST_IGNORE_SPACE"
+    ];
+
+    # ── Khởi tạo: fzf keybindings + sudo shortcut + extract function ──
+    interactiveShellInit = ''
+      # FZF keybindings (thay oh-my-zsh fzf plugin)
+      source ${pkgs.fzf}/share/fzf/key-bindings.zsh
+      source ${pkgs.fzf}/share/fzf/completion.zsh
+
+      # Esc-Esc để thêm sudo (thay oh-my-zsh sudo plugin)
+      sudo-command-line() {
+        [[ -z $BUFFER ]] && zle up-history
+        [[ $BUFFER != sudo\ * ]] && BUFFER="sudo $BUFFER"
+        zle end-of-line
+      }
+      zle -N sudo-command-line
+      bindkey "^[^[" sudo-command-line
+
+      # Extract mọi định dạng nén (thay oh-my-zsh extract plugin)
+      extract() {
+        if [ -f $1 ]; then
+          case $1 in
+            *.tar.bz2) tar xjf $1 ;;
+            *.tar.gz)  tar xzf $1 ;;
+            *.bz2)     bunzip2 $1 ;;
+            *.rar)     unrar x $1 ;;
+            *.gz)      gunzip $1 ;;
+            *.tar)     tar xf $1 ;;
+            *.tbz2)    tar xjf $1 ;;
+            *.tgz)     tar xzf $1 ;;
+            *.zip)     unzip $1 ;;
+            *.Z)       uncompress $1 ;;
+            *.7z)      7z x $1 ;;
+            *)         echo "'$1' cannot be extracted via extract()" ;;
+          esac
+        else
+          echo "'$1' is not a valid file"
+        fi
+      }
+    '';
+
     shellAliases = {
-      ll = "ls -alF"; la = "ls -A"; l = "ls -CF";
-# Sử dụng: build "Fix-Unikey"
-  build = "f() { sudo NIXOS_LABEL=\"$1\" nixos-rebuild switch --flake ~/.config/nixos/#lg; }; f";
-  
-  # Giữ lại các alias cũ
-  update = "sudo nixos-rebuild switch --flake ~/.config/nixos/#lg";
-  clean = "sudo nix-collect-garbage -d";
-      dco = "podman-compose"; d = "podman"; v = "vim";
+      # ── Điều hướng ──
+      ll = "ls -alF";
+      la = "ls -A";
+      l  = "ls -CF";
+      ".."  = "cd ..";
+      "..." = "cd ../..";
+
+      # ── NixOS ──
+      # build "Add new config" → git add . && git commit && rebuild với label
+      build  = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')\" nixos-rebuild switch --flake .#lg; }; f";
+      update = "noglob sudo nixos-rebuild switch --flake ~/.config/nixos/#lg";
+      clean  = "sudo nix-collect-garbage -d";
+
+      # ── Podman / Docker ──
+      dco = "podman-compose";
+      d   = "podman";
+
+      # ── Editor ──
+      v = "vim";
+
+      # ── Git ──
+      g  = "git";
+      gs = "git status";
+      ga = "git add";
+      gc = "git commit -m";
+      gp = "git push";
+      gl = "git log --oneline --graph --all";
+      gd = "git diff";
+
+      # ── Dev shortcuts (dùng với devbox) ──
+      dev = "devbox";
+      nrs = "npm run serve";
+      nrd = "npm run dev";
+      nrw = "npm run watch";
+
+      # ── zoxide (thay oh-my-zsh z plugin) ──
+      z = "zoxide";
     };
   };
+
+  programs.zoxide.enable = true;
 
   programs.direnv = {
     enable = true;
@@ -82,21 +164,57 @@
   };
 
   # =====================================================================
-  # 3. HỆ THỐNG CỐT LÕI & NGỦ ĐÔNG (HIBERNATE)
+  # 3. HỆ THỐNG CỐT LÕI & NGỦ ĐÔNG (HIBERNATE) — TỐI ƯU KHỞI ĐỘNG
   # =====================================================================
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # UUID phân vùng Swap (Chuẩn xác cho máy anh để kích hoạt Hibernate)
-  boot.resumeDevice = "/dev/disk/by-uuid/4b931d72-02dd-4925-b788-042205a0e393";
-
-  # Cơ chế bảo vệ pin: Suspend (ngủ tạm) rồi tự động Hibernate (ngủ đông)
-  services.logind.lidSwitch = "suspend-then-hibernate";
-  systemd.sleep.settings.Sleep = {
-    HibernateDelaySec = "30min"; # Sau 30 phút Sleep sẽ tự động tắt máy vào Hibernate
+  # systemd initrd — thay thế bash initrd, khởi động nhanh hơn ~40%
+  boot.initrd.systemd = {
+    enable = true;
+    emergencyAccess = false;
+    enableTpm2 = false;
   };
 
+  # Plymouth splash — không chữ, chỉ logo LG
+  boot.plymouth = {
+    enable = true;
+    theme = "bgrt";
+  };
+
+  # UUID phân vùng Swap
+  boot.resumeDevice = "/dev/disk/by-uuid/4b931d72-02dd-4925-b788-042205a0e393";
+
+  # Tham số kernel: yên lặng + tiết kiệm pin + tắt watchdog
+  boot.kernelParams = [
+    "quiet"
+    "splash"
+    "loglevel=3"
+    "rd.systemd.show_status=false"
+    "nowatchdog"
+    "modprobe.blacklist=iTCO_wdt"
+    "i915.enable_fbc=1"
+    "i915.enable_psr=1"
+  ];
+
+  # Cơ chế bảo vệ pin: Suspend-then-Hibernate
+  services.logind.settings.Login.HandleLidSwitch = "suspend-then-hibernate";
+  systemd.sleep.settings.Sleep = {
+    HibernateDelaySec = "30min";
+  };
+
+  # Giảm timeout systemd khi shutdown (mặc định 90s -> 10s)
+  systemd.extraConfig = ''
+    DefaultTimeoutStartSec=10s
+    DefaultTimeoutStopSec=10s
+    DefaultDeviceTimeoutSec=10s
+  '';
+
+  # Không đợi Network Manager online khi boot
+  systemd.services.NetworkManager-wait-online.enable = false;
+
   networking.hostName = "lg";
+
   networking.networkmanager.enable = true;
 
   time.timeZone = "Asia/Ho_Chi_Minh";
@@ -106,9 +224,9 @@
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
-    fcitx5.addons = with pkgs; [ 
-      qt6Packages.fcitx5-unikey 
-      fcitx5-table-extra 
+    fcitx5.addons = with pkgs; [
+      qt6Packages.fcitx5-unikey
+      fcitx5-table-extra
       fcitx5-gtk
     ];
     fcitx5.waylandFrontend = true;
@@ -131,7 +249,7 @@
     open = false;
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
-    
+
     # Tiết kiệm điện: Tắt GPU NVIDIA hoàn toàn khi không xử lý nặng
     powerManagement.enable = true;
     powerManagement.finegrained = true;
@@ -152,15 +270,50 @@
   services.tlp = {
     enable = true;
     settings = {
+      # --- CPU & Governor ---
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+      CPU_ENERGY_PERF_POLICY_ON_AC = "balance_performance";
       CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-      
-      # Giới hạn hiệu năng CPU tối đa 70% khi rút sạc để máy luôn mát và bền pin
-      CPU_MAX_PERF_ON_BAT = 70; 
+      CPU_BOOST_ON_AC = 1;
+      CPU_BOOST_ON_BAT = 0;
+      CPU_HWP_DYN_BOOST_ON_AC = 1;
+      CPU_HWP_DYN_BOOST_ON_BAT = 0;
 
-      # Tự động quản lý năng lượng các cổng kết nối ngoại vi
+      # Giới hạn hiệu năng CPU khi rút sạc (xung nhịp tối đa = 60%)
+      CPU_MAX_PERF_ON_BAT = 60;
+      CPU_MIN_PERF_ON_BAT = 0;
+
+      # --- PCIe ASPM (Active State Power Management) ---
+      PCIE_ASPM_ON_AC = "default";
+      PCIE_ASPM_ON_BAT = "powersupersave";
+
+      # --- Wi-Fi Power Saving ---
+      WIFI_PWR_ON_AC = "off";
+      WIFI_PWR_ON_BAT = "on";
+
+      # --- USB Autosuspend ---
+      USB_AUTOSUSPEND = 1;
+      USB_AUTOSUSPEND_DISABLE_ON_SHUTDOWN = 1;
+      USB_DENYLIST = "046d:c318 046d:c52b";  # Giữ chuột/bàn phím ngoài luôn hoạt động
+
+      # --- Runtime PM cho thiết bị ngoại vi ---
+      RUNTIME_PM_ON_AC = "on";
       RUNTIME_PM_ON_BAT = "auto";
+      RUNTIME_PM_DRIVER_DENYLIST = "mei_me nvidia";
+
+      # --- Âm thanh: Tự động tắt chip âm thanh khi không dùng ---
+      SOUND_POWER_SAVE_ON_AC = 0;
+      SOUND_POWER_SAVE_ON_BAT = 1;
+      SOUND_POWER_SAVE_CONTROLLER = "Y";
+
+      # --- Nền tảng Intel ---
+      INTEL_GPU_MIN_FREQ_ON_BAT = 300;
+      INTEL_GPU_MAX_FREQ_ON_BAT = 650;
+      INTEL_GPU_BOOST_FREQ_ON_BAT = 900;
+
+      # --- NVMe Power Management ---
+      NVME_PS_MODE = "lowest";
     };
   };
 
@@ -168,8 +321,15 @@
   powerManagement.powertop.enable = true;
 
   # =====================================================================
-  # 5. ÂM THANH & DỊCH VỤ KHÁC
+  # 5. BLUETOOTH, ÂM THANH & DỊCH VỤ KHÁC
   # =====================================================================
+  # Bluetooth: luôn có sẵn nhưng KHÔNG tự bật khi khởi động để tiết kiệm pin
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = false;
+  };
+
+
   services.printing.enable = true;
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
