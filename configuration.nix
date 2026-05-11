@@ -203,14 +203,14 @@
     HibernateDelaySec = "30min";
   };
 
-  # Giảm timeout systemd khi shutdown (mặc định 90s -> 10s)
-  systemd.extraConfig = ''
-    DefaultTimeoutStartSec=10s
-    DefaultTimeoutStopSec=10s
-    DefaultDeviceTimeoutSec=10s
-  '';
 
-  # Không đợi Network Manager online khi boot
+  # Giảm timeout systemd (mặc định 90s -> 10s) + không đợi NetworkManager (mặc định 90s -> 10s)
+  systemd.settings.Manager = {
+    DefaultTimeoutStartSec = "10s";
+    DefaultTimeoutStopSec = "10s";
+    DefaultDeviceTimeoutSec = "10s";
+  };
+
   systemd.services.NetworkManager-wait-online.enable = false;
 
   networking.hostName = "lg";
