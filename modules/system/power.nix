@@ -20,6 +20,7 @@
   '';
 
   # ── TLP: tối ưu pin toàn diện cho Comet Lake ─────────────────────────
+  services.power-profiles-daemon.enable = false;
   services.tlp = {
     enable = true;
     settings = {
