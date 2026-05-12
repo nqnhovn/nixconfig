@@ -23,7 +23,7 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./hosts/lg/default.nix
-          userborn.nixosModules.userborn
+          userborn.nixosModules.default
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
