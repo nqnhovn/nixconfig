@@ -1,9 +1,9 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   home.packages = with pkgs; [
     btop
-    devbox
+    devenv
     gh
     vim
     zed-editor

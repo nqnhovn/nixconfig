@@ -2,7 +2,7 @@
 # MODULES/SYSTEM/BOOT.NIX — BOOTLOADER, KERNEL, INITRD, PLYMOUTH
 # =====================================================================
 
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   # ── Bootloader ────────────────────────────────────────────────────────

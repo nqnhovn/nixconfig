@@ -2,7 +2,7 @@
 # MODULES/SYSTEM/DISPLAY.NIX — NVIDIA, GNOME, GPU
 # =====================================================================
 
-{ config, pkgs, ... }:
+{ config, ... }:
 
 {
   services.xserver.videoDrivers = [ "nvidia" ];

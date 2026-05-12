@@ -76,7 +76,7 @@
       gl = "git log --oneline --graph --all";
       gd = "git diff";
 
-      dev = "devbox";
+      dev = "devenv";
       nrs = "npm run serve";
       nrd = "npm run dev";
       nrw = "npm run watch";
