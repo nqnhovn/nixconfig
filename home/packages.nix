@@ -12,6 +12,7 @@
     distrobox
     bat               # cat có syntax highlighting + line number
     fd                # find nhanh hơn
-    appflowy
+    # appflowy
+    reno
   ];
 }
