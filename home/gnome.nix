@@ -18,10 +18,10 @@
     "org/gnome/settings-daemon/plugins/power" = {
       power-button-action = "hibernate";
       sleep-button-action = "hibernate";
-      sleep-inactive-ac-timeout = 600;
-      sleep-inactive-ac-type = "hibernate";
-      sleep-inactive-battery-timeout = 600;
-      sleep-inactive-battery-type = "hibernate";
+      sleep-inactive-ac-timeout = 300;
+      sleep-inactive-ac-type = "nothing";
+      sleep-inactive-battery-timeout = 300;
+      sleep-inactive-battery-type = "nothing";
     };
   };
 }

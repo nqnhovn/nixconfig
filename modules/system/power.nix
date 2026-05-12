@@ -8,15 +8,8 @@
   services.logind.settings.Login = {
     HandleLidSwitch = "hibernate";
     HandlePowerKey = "hibernate";
-    IdleAction = "hibernate";
-    IdleActionSec = "10min";
-  };
-
-  systemd.sleep.settings.Sleep = {
-    AllowSuspend = "no";
-    AllowHibernation = "yes";
-    AllowSuspendThenHibernate = "no";
-    AllowHybridSleep = "no";
+    IdleAction = "ignore";
+    IdleActionSec = "5min";
   };
 
   powerManagement.resumeCommands = ''
