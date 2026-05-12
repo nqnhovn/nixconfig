@@ -11,19 +11,55 @@
     enable = true;
     # Thư viện cần cho Electron apps + GUI + AppImage
     libraries = with pkgs; [
-      glib gtk3 pango cairo freetype      # GUI core
-      libnotify libappindicator-gtk3       # Notification tray
-      libdrm mesa libgbm expat at-spi2-core                    # GPU + X11
-      libxkbcommon libX11 libxcb libXcomposite
-      libXdamage libXrandr libXcursor
-      libXfixes libXi libXtst libXinerama
-      libXext libXt libXrender libXScrnSaver
-      libXxf86vm libXau libXdmcp libxshmfence
-      libICE libSM libpciaccess libGL
-      nss nspr at-spi2-atk atk            # Electron/Chrome
-      cups dbus openssl systemd                    # Printing + IPC
-      util-linux zlib fontconfig libpng pkgs."alsa-lib"    # System
-      stdenv.cc.cc.lib                      # libstdc++.so.6
+      glib
+      gtk3
+      pango
+      cairo
+      freetype # GUI core
+      libnotify
+      libappindicator-gtk3 # Notification tray
+      libdrm
+      mesa
+      libgbm
+      expat
+      at-spi2-core # GPU + X11
+      libxkbcommon
+      libX11
+      libxcb
+      libXcomposite
+      libXdamage
+      libXrandr
+      libXcursor
+      libXfixes
+      libXi
+      libXtst
+      libXinerama
+      libXext
+      libXt
+      libXrender
+      libXScrnSaver
+      libXxf86vm
+      libXau
+      libXdmcp
+      libxshmfence
+      libICE
+      libSM
+      libpciaccess
+      libGL
+      nss
+      nspr
+      at-spi2-atk
+      atk # Electron/Chrome
+      cups
+      dbus
+      openssl
+      systemd # Printing + IPC
+      util-linux
+      zlib
+      fontconfig
+      libpng
+      pkgs."alsa-lib" # System
+      stdenv.cc.cc.lib # libstdc++.so.6
     ];
   };
 
@@ -48,17 +84,33 @@
 
   # ── System packages ───────────────────────────────────────────────────
   environment.systemPackages = with pkgs; [
-    wget git fzf ripgrep gnumake pciutils usbutils
+    wget
+    git
+    fzf
+    ripgrep
+    gnumake
+    pciutils
+    usbutils
     python3
     home-manager
     zsh-completions
-    gnomeExtensions.caffeine gnomeExtensions.appindicator
+    gnomeExtensions.caffeine
+    gnomeExtensions.appindicator
   ];
 
   environment.gnome.excludePackages = with pkgs; [
-    gnome-tour epiphany geary totem gnome-music
-    gnome-characters gnome-contacts gnome-weather
-    tali iagno hitori atomix
+    gnome-tour
+    epiphany
+    geary
+    totem
+    gnome-music
+    gnome-characters
+    gnome-contacts
+    gnome-weather
+    tali
+    iagno
+    hitori
+    atomix
   ];
 
   # ── Session variables (ép GPU Intel cho desktop) ──────────────────────

@@ -49,6 +49,7 @@
         "PHP": { "language_servers": ["intelephense"], "tab_size": 4 },
         "TypeScript": { "language_servers": ["typescript-language-server", "tailwindcss-language-server"], "tab_size": 2 },
         "JavaScript": { "language_servers": ["typescript-language-server"], "tab_size": 2 },
+        "Nix": { "language_servers": ["nixd"], "tab_size": 2 },
         "Python": { "language_servers": ["pyright"], "tab_size": 4 },
         "JSON": { "tab_size": 2 },
         "Markdown": { "tab_size": 2 }

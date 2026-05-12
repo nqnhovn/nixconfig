@@ -1,0 +1,26 @@
+{
+  "packages": [
+    "nixpkgs-fmt@latest",
+    "nil@latest",
+    "shellcheck@latest",
+    "python3@latest",
+    "bat@latest",
+    "eza@latest",
+    "fd@latest",
+    "jq@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo '❄️  NixOS Config Dev Environment'",
+      "echo '   nixpkgs-fmt  → format .nix files'",
+      "echo '   nil          → Nix LSP'",
+      "echo '   shellcheck   → lint .sh files'",
+      "echo '   bat/eza/fd   → modern CLI tools'"
+    ],
+    "scripts": {
+      "fmt": "nixpkgs-fmt *.nix modules/**/*.nix home/**/*.nix hosts/**/*.nix",
+      "check": "shellcheck initial.sh",
+      "build": "sudo nixos-rebuild switch --flake .#lg"
+    }
+  }
+}

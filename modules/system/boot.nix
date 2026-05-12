@@ -8,13 +8,13 @@
   # ── Bootloader ────────────────────────────────────────────────────────
   boot.loader.systemd-boot = {
     enable = true;
-    configurationLimit = 3;  # Chỉ giữ 3 generation gần nhất
+    configurationLimit = 3; # Chỉ giữ 3 generation gần nhất
     editor = false;
     memtest86.enable = false;
     consoleMode = "auto";
   };
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.timeout = 3;  # Chỉ đợi 3 giây khi boot
+  boot.loader.timeout = 3; # Chỉ đợi 3 giây khi boot
 
   # ── Kernel mới nhất ───────────────────────────────────────────────────
   boot.kernelPackages = pkgs.linuxPackages_latest;

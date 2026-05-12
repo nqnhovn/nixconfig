@@ -55,8 +55,8 @@
     shellAliases = {
       ll = "ls -alF";
       la = "ls -A";
-      l  = "ls -CF";
-      ".."  = "cd ..";
+      l = "ls -CF";
+      ".." = "cd ..";
       "..." = "cd ../..";
 
       build = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && GIT_HASH=$(git rev-parse --short HEAD) && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')-$GIT_HASH\" nixos-rebuild switch --flake .\\#lg && git push; }; f";
@@ -65,14 +65,21 @@
       clean = "f() { echo '=== Cac the he hien tai ==='; sudo nix-env --list-generations --profile /nix/var/nix/profiles/system; echo ''; echo -n 'Nhap so gen muon xoa (Enter de bo qua): '; read -r gens; if [ -n \"$gens\" ]; then for g in $(echo $gens); do sudo nix-env --delete-generations $g --profile /nix/var/nix/profiles/system; done; echo 'Da xoa.'; fi; echo 'Dang don rac...'; sudo nix-collect-garbage -d; echo 'Hoan tat!'; }; f";
 
       dco = "podman-compose";
-      d   = "podman";
+      d = "podman";
       v = "vim";
 
-      g  = "git"; gs = "git status"; ga = "git add"; gc = "git commit -m";
-      gp = "git push"; gl = "git log --oneline --graph --all"; gd = "git diff";
+      g = "git";
+      gs = "git status";
+      ga = "git add";
+      gc = "git commit -m";
+      gp = "git push";
+      gl = "git log --oneline --graph --all";
+      gd = "git diff";
 
       dev = "devbox";
-      nrs = "npm run serve"; nrd = "npm run dev"; nrw = "npm run watch";
+      nrs = "npm run serve";
+      nrd = "npm run dev";
+      nrw = "npm run watch";
       z = "zoxide";
     };
   };
