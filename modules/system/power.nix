@@ -1,5 +1,5 @@
 # =====================================================================
-# MODULES/SYSTEM/POWER.NIX — HIBERNATE, TLP + tlp.pd, THERMALD, POWERTOP
+# MODULES/SYSTEM/POWER.NIX — HIBERNATE, TLP, THERMALD, POWERTOP
 # LG GRAM 17 (i5-10210U Comet Lake + NVIDIA GTX 1650)
 # =====================================================================
 
@@ -19,13 +19,9 @@
     echo -n "i8042" > /sys/bus/platform/drivers/i8042/bind
   '';
 
-  # ── TLP: tối ưu pin chuyên sâu ───────────────────────────────────────
+  # ── TLP: tối ưu pin toàn diện cho Comet Lake ─────────────────────────
   services.tlp = {
     enable = true;
-
-    # PPD-compatible D-Bus → GNOME hiển thị Power Saver / Balanced / Performance
-    pd.enable = true;
-
     settings = {
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
