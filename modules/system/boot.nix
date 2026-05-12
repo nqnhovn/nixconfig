@@ -50,6 +50,9 @@
     "i915.enable_fbc=1"
     "i8042.nopnp=1"
     "i8042.dumbkbd=1"
+    "nvme_core.default_ps_max_latency_us=200"
+    "i915.min_freq=300"
+    "i915.max_freq=650"
     "i915.enable_psr=1"
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
   ];
