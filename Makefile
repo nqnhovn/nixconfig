@@ -168,7 +168,7 @@ _home:
 	@echo -e "\n$(BLUE)🏠 HOME-MANAGER SWITCH$(RESET)"; \
 	commit_msg="Home-Manager update"; \
 	cd $(DOTFILES_DIR) && $(_git_sync); \
-	cd $(DOTFILES_DIR) && home-manager switch --flake .#lg && \
+	sudo nixos-rebuild switch --flake .#lg && \
 	echo -e "$(GREEN)✅ Home-Manager đã cập nhật!$(RESET)"
 
 _delete:
