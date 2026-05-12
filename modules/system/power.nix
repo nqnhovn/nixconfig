@@ -20,6 +20,11 @@
   '';
 
   # ── tuned 2.27 + PPD ─────────────────────────────────────────────────
+  # udev rule: tự động chuyển profile khi cắm/rút sạc
+  services.udev.extraRules = ''
+    SUBSYSTEM=="power_supply", ATTR{online}=="1", RUN+="${pkgs.tuned}/bin/tuned-adm profile laptop-ac-powersave"
+    SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.tuned}/bin/tuned-adm profile laptop-battery-powersave"
+  '';
   services.tuned = {
     enable = true;
     ppdSupport = true;
