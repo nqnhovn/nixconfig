@@ -22,6 +22,7 @@
   # ── TLP: tối ưu pin toàn diện cho Comet Lake ─────────────────────────
   services.power-profiles-daemon.enable = false;
   services.tlp = {
+    pd.enable = true;
     enable = true;
     settings = {
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
