@@ -111,10 +111,12 @@
       "..." = "cd ../..";
 
       # ── NixOS ──
-      # build "Add new config" → git add . && git commit && rebuild với label
+      # build "msg" -> git add . && git commit -m "msg" && rebuild (label = slug cua msg)
       build  = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')\" nixos-rebuild switch --flake .#lg; }; f";
-      update = "noglob sudo nixos-rebuild switch --flake ~/.config/nixos/#lg";
-      clean  = "sudo nix-collect-garbage -d";
+      sysupdate = "noglob sudo nixos-rebuild switch --flake ~/.config/nixos/#lg";
+      hmupdate  = "home-manager switch --flake ~/.config/nixos/#lg";
+      # clean -> liet ke generation, chon xoa, don rac
+      clean = "f() { echo '=== Cac the he hien tai ==='; sudo nix-env --list-generations --profile /nix/var/nix/profiles/system; echo ''; echo -n 'Nhap so gen muon xoa (Enter de bo qua): '; read -r gens; if [ -n \"$gens\" ]; then for g in $(echo $gens); do sudo nix-env --delete-generations $g --profile /nix/var/nix/profiles/system; done; echo 'Da xoa.'; fi; echo 'Dang don rac...'; sudo nix-collect-garbage -d; echo 'Hoan tat!'; }; f";
 
       # ── Podman / Docker ──
       dco = "podman-compose";
@@ -200,6 +202,9 @@
   services.logind.settings.Login = {
     HandleLidSwitch = "hibernate";
     HandlePowerKey = "hibernate";
+    # Tự động hibernate sau 10 phút không dùng
+    IdleAction = "hibernate";
+    IdleActionSec = "10min";
   };
   # Tắt suspend hoàn toàn — chỉ dùng Hibernate
   systemd.sleep.settings.Sleep = {
@@ -248,7 +253,11 @@
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
   services.xserver.xkb.layout = "us";
-  environment.sessionVariables = { NIXOS_OZONE_WL = "1"; }; # Giúp các app như Chrome/Zed chạy mượt trên Wayland
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    __GLX_VENDOR_LIBRARY_NAME = "mesa";  # Ep GPU Intel cho desktop
+    DRI_PRIME = "0";                      # Uu tien GPU Intel
+  };
 
   # =====================================================================
   # 4. ĐỒ HỌA NVIDIA & TỐI ƯU PIN (TLP)

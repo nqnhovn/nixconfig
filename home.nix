@@ -175,6 +175,11 @@
     "org/gnome/settings-daemon/plugins/power" = {
       power-button-action = "hibernate";
       sleep-button-action = "hibernate";
+      # Tự động hibernate sau 10 phút không dùng (Caffeine chặn nếu đang bật)
+      sleep-inactive-ac-timeout = 600;
+      sleep-inactive-ac-type = "hibernate";
+      sleep-inactive-battery-timeout = 600;
+      sleep-inactive-battery-type = "hibernate";
     };
   };
 }
