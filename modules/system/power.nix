@@ -22,10 +22,23 @@
   # ── tuned (không PPD — dùng udev tự chuyển profile) ─────────────────
   services.tuned.enable = true;
 
-  # udev: cắm sạc → balanced, rút sạc → laptop-battery-powersave
+  # systemd service: tự động chuyển tuned profile khi cắm/rút sạc
+  systemd.services.tuned-ac-switch = {
+    description = "Switch tuned profile on AC plug/unplug";
+    path = [ pkgs.tuned ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      if [ "$(cat /sys/class/power_supply/AC*/online 2>/dev/null)" = "1" ]; then
+        tuned-adm profile balanced
+      else
+        tuned-adm profile laptop-battery-powersave
+      fi
+    '';
+  };
+
+  # udev rule kích hoạt service
   services.udev.extraRules = ''
-    SUBSYSTEM=="power_supply", ATTR{online}=="1", RUN+="${pkgs.tuned}/bin/tuned-adm profile balanced"
-    SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.tuned}/bin/tuned-adm profile laptop-battery-powersave"
+    SUBSYSTEM=="power_supply", ACTION=="change", RUN+="${pkgs.systemd}/bin/systemctl start tuned-ac-switch"
   '';
 
   services.power-profiles-daemon.enable = false;
