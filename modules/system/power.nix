@@ -19,26 +19,28 @@
     echo -n "i8042" > /sys/bus/platform/drivers/i8042/bind
   '';
 
-  # ── tuned (không PPD — dùng udev tự chuyển profile) ─────────────────
+  # ── tuned (tự chuyển profile qua systemd oneshot + udev) ─────────────
   services.tuned.enable = true;
 
-  # systemd service: tự động chuyển tuned profile khi cắm/rút sạc
+  # systemd service: chuyển profile khi AC thay đổi, có chống loop
   systemd.services.tuned-ac-switch = {
     description = "Switch tuned profile on AC plug/unplug";
-    path = [ pkgs.tuned ];
+    path = [ pkgs.tuned pkgs.gawk ];
     serviceConfig.Type = "oneshot";
     script = ''
-      if [ "$(cat /sys/class/power_supply/AC*/online 2>/dev/null)" = "1" ]; then
+      CURRENT=$(tuned-adm active 2>/dev/null | awk -F': ' '{print $2}')
+      ONLINE=$(cat /sys/class/power_supply/AC*/online 2>/dev/null | head -1)
+      if [ "$ONLINE" = "1" ] && [ "$CURRENT" != "balanced" ]; then
         tuned-adm profile balanced
-      else
+      elif [ "$ONLINE" = "0" ] && [ "$CURRENT" != "laptop-battery-powersave" ]; then
         tuned-adm profile laptop-battery-powersave
       fi
     '';
   };
 
-  # udev rule kích hoạt service
+  # udev: kích hoạt service khi online attribute thay đổi (--no-block tránh loop)
   services.udev.extraRules = ''
-    SUBSYSTEM=="power_supply", ACTION=="change", RUN+="${pkgs.systemd}/bin/systemctl start tuned-ac-switch"
+    SUBSYSTEM=="power_supply", ENV{POWER_SUPPLY_ONLINE}=="?*", RUN+="${pkgs.systemd}/bin/systemctl start --no-block tuned-ac-switch"
   '';
 
   services.power-profiles-daemon.enable = false;
