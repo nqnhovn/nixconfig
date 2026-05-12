@@ -1,0 +1,3 @@
+# Auto-load devbox shell khi cd vào thư mục này
+# Cần chạy: direnv allow (1 lần)
+use devbox

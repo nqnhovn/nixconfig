@@ -1,0 +1,20 @@
+{
+  "packages": [
+    "php@8.3",
+    "php@8.3Extensions.pdo",
+    "php@8.3Extensions.mbstring",
+    "php@8.3Extensions.curl",
+    "php@8.3Extensions.xml",
+    "php@8.3Extensions.zip",
+    "composer@latest",
+    "nodejs@22",
+    "pnpm@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo '🐘 PHP '$(php -v | head -1 | cut -d' ' -f2)",
+      "echo '📦 Composer '$(composer --version | cut -d' ' -f3)",
+      "echo '🟢 Node '$(node -v)"
+    ]
+  }
+}

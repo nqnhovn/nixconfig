@@ -1,0 +1,12 @@
+{
+  "packages": [
+    "go@1.23",
+    "gopls@latest",
+    "golangci-lint@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo '🔵 Go '$(go version | cut -d' ' -f3)"
+    ]
+  }
+}
