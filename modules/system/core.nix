@@ -5,8 +5,7 @@
 { config, pkgs, ... }:
 
 {
-  # ── User (Rust-based userborn thay thế useradd) ───────────────────────
-  services.userborn.enable = true;
+  # ── User ─────────────────────────────────────────────────────────────
 
   users.users.nqnhovn = {
     isNormalUser = true;
