@@ -62,6 +62,7 @@ list:
 				sudo nix-env -p $(NIX_MAIN_PROFILES)/system --switch-generation $$real_id; \
 				sudo $(NIX_MAIN_PROFILES)/system/bin/switch-to-configuration switch; \
 				echo -e "$(BLUE)✅ Hoàn thành!$(RESET)"; \
+				_git_sync_gen $$real_id; \
 				read -p "Reboot? (y/N): " rb; \
 				[[ "$$rb" =~ ^[Yy] ]] && sudo reboot; \
 			else \
@@ -152,8 +153,9 @@ _switch:
 	$(_get_label); \
 	commit_msg="$${slug_label:-Cập nhật cấu hình}"; \
 	$(_git_sync); \
+	GIT_HASH=$$(cd $(DOTFILES_DIR) && git rev-parse --short HEAD 2>/dev/null || echo "0000000"); \
 	if [ -n "$$full_label" ]; then \
-		cd $(DOTFILES_DIR) && sudo NIXOS_LABEL="$$full_label" nixos-rebuild switch --flake .#lg; \
+		cd $(DOTFILES_DIR) && sudo NIXOS_LABEL="$$full_label-$$GIT_HASH" nixos-rebuild switch --flake .#lg; \
 	else \
 		cd $(DOTFILES_DIR) && sudo nixos-rebuild switch --flake .#lg; \
 	fi && \
@@ -189,3 +191,17 @@ _delete:
 	done; \
 	sudo nix-collect-garbage -d; \
 	echo -e "$(GREEN)✅ Đã dọn rác$(RESET)"
+
+define _git_sync_gen
+	cd $(DOTFILES_DIR); \
+	if [ -n "$$1" ]; then \
+		HASH="$$1"; \
+	else \
+		HASH=$$(echo "$$label" | grep -oP "[a-f0-9]{7}$$" 2>/dev/null || echo ""); \
+	fi; \
+	if [ -n "$$HASH" ] && [ -d $(DOTFILES_DIR)/.git ]; then \
+		echo -e "$(CYAN)🔄 Đồng bộ Git về commit $$HASH...$(RESET)"; \
+		cd $(DOTFILES_DIR); \
+		git checkout --quiet "$$HASH" 2>/dev/null && echo -e "$(GREEN)✅ Git đã chuyển về commit $$HASH$(RESET)" || echo -e "$(YELLOW)⚠️  Không checkout được (có thay đổi local?)$(RESET)"; \
+	fi
+endef

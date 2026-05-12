@@ -59,8 +59,8 @@
       ".."  = "cd ..";
       "..." = "cd ../..";
 
-      build = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')\" nixos-rebuild switch --flake .\\#lg && git push; }; f";
-      sysupdate = "noglob f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d\\ %H:%M)\"; fi; sudo nixos-rebuild switch --flake .\\#lg && git push; }; f";
+      build = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && GIT_HASH=$(git rev-parse --short HEAD) && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')-$GIT_HASH\" nixos-rebuild switch --flake .\\#lg && git push; }; f";
+      sysupdate = "noglob f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d\\ %H:%M)\"; fi; GIT_HASH=$(git rev-parse --short HEAD); sudo NIXOS_LABEL=\"sysupdate-$(date +%Y%m%d-%H%M)-$GIT_HASH\" nixos-rebuild switch --flake .\\#lg && git push; }; f";
       appupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"appupdate: $(date +%Y-%m-%d\\ %H:%M)\"; fi; home-manager switch --flake .\\#lg; }; f";
       clean = "f() { echo '=== Cac the he hien tai ==='; sudo nix-env --list-generations --profile /nix/var/nix/profiles/system; echo ''; echo -n 'Nhap so gen muon xoa (Enter de bo qua): '; read -r gens; if [ -n \"$gens\" ]; then for g in $(echo $gens); do sudo nix-env --delete-generations $g --profile /nix/var/nix/profiles/system; done; echo 'Da xoa.'; fi; echo 'Dang don rac...'; sudo nix-collect-garbage -d; echo 'Hoan tat!'; }; f";
 
