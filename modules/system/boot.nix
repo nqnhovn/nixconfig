@@ -9,7 +9,7 @@
   boot.loader.systemd-boot = {
     enable = true;
     configurationLimit = 3;  # Chỉ giữ 3 generation gần nhất
-    editorConfig = false;
+    editor = false;
     memtest86.enable = false;
     consoleMode = "auto";
   };
