@@ -22,7 +22,7 @@
       libICE libSM libpciaccess libGL
       nss nspr at-spi2-atk atk            # Electron/Chrome
       cups dbus openssl                    # Printing + IPC
-      util-linux zlib fontconfig libpng gdk-pixbuf harfbuzz alsaLib pulseaudio    # System
+      util-linux zlib fontconfig libpng    # System
       stdenv.cc.cc.lib                      # libstdc++.so.6
     ];
   };
