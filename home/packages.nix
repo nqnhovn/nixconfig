@@ -14,5 +14,6 @@
     fd                # find nhanh hơn
     # appflowy
     reno
+    gnote
   ];
 }
