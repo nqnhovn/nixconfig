@@ -63,6 +63,5 @@
     "vm.dirty_ratio" = 10;
     "vm.dirty_background_ratio" = 3;
     "kernel.numa_balancing" = 0;
-    "kernel.sched_energy_aware" = 1;
   };
 }
