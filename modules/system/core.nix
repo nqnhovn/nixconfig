@@ -6,6 +6,9 @@
 
 {
   # ── User ─────────────────────────────────────────────────────────────
+  # Cho phép chạy file nhị phân Linux thông thường (vd: balena-etcher)
+  programs.nix-ld.enable = true;
+
 
   users.users.nqnhovn = {
     isNormalUser = true;

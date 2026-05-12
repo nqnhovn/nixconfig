@@ -32,9 +32,6 @@
         "enabled": true
       },
 
-      "file_finder": {
-        "modal_max_width": 800
-      },
 
       "terminal": {
         "font_size": 14.0,
