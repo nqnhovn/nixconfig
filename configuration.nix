@@ -111,13 +111,14 @@
       "..." = "cd ../..";
 
       # ── NixOS ──
-      # build "msg" -> git add . && git commit -m "msg" && rebuild (label = slug cua msg)
-      build  = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')\" nixos-rebuild switch --flake .\#lg; }; f";
-      sysupdate = "noglob sudo nixos-rebuild switch --flake ~/.config/nixos/#lg";
-      hmupdate  = "home-manager switch --flake ~/.config/nixos/#lg";
+      # build "msg"  -> git add/commit + rebuild + push (label = slug msg)
+      # sysupdate    -> git add/commit (if dirty) + rebuild + push
+      # appupdate     -> git add/commit (if dirty) + home-manager switch
+      build = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')\" nixos-rebuild switch --flake .\\#lg && git push; }; f";
+      sysupdate = "noglob f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d\\ %H:%M)\"; fi; sudo nixos-rebuild switch --flake .\\#lg && git push; }; f";
+      appupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"appupdate: $(date +%Y-%m-%d\\ %H:%M)\"; fi; home-manager switch --flake .\\#lg; }; f";
       # clean -> liet ke generation, chon xoa, don rac
       clean = "f() { echo '=== Cac the he hien tai ==='; sudo nix-env --list-generations --profile /nix/var/nix/profiles/system; echo ''; echo -n 'Nhap so gen muon xoa (Enter de bo qua): '; read -r gens; if [ -n \"$gens\" ]; then for g in $(echo $gens); do sudo nix-env --delete-generations $g --profile /nix/var/nix/profiles/system; done; echo 'Da xoa.'; fi; echo 'Dang don rac...'; sudo nix-collect-garbage -d; echo 'Hoan tat!'; }; f";
-
       # ── Podman / Docker ──
       dco = "podman-compose";
       d   = "podman";
