@@ -17,9 +17,12 @@
       libxkbcommon libX11 libxcb libXcomposite
       libXdamage libXrandr libXcursor
       libXfixes libXi libXtst libXinerama
+      libXext libXt libXrender libXScrnSaver
+      libXxf86vm libXau libXdmcp libxshmfence
+      libICE libSM libpciaccess libGL
       nss nspr at-spi2-atk atk            # Electron/Chrome
       cups dbus openssl                    # Printing + IPC
-      util-linux zlib fontconfig libpng    # System
+      util-linux zlib fontconfig libpng gdk-pixbuf harfbuzz alsaLib pulseaudio    # System
       stdenv.cc.cc.lib                      # libstdc++.so.6
     ];
   };
