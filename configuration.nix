@@ -190,17 +190,32 @@
     "nowatchdog"
     "modprobe.blacklist=iTCO_wdt"
     "i915.enable_fbc=1"
+    "i8042.reset"
+    "i8042.nomux=1"
+    "atkbd.reset=1"
     "i915.enable_psr=1"
   ];
 
-  # Cơ chế bảo vệ pin: Suspend-then-Hibernate
-  services.logind.settings.Login.HandleLidSwitch = "suspend-then-hibernate";
+  # Cơ chế bảo vệ pin: Hibernate trực tiếp
+  services.logind.settings.Login = {
+    HandleLidSwitch = "hibernate";
+    HandlePowerKey = "hibernate";
+  };
+  # Tắt suspend hoàn toàn — chỉ dùng Hibernate
   systemd.sleep.settings.Sleep = {
-    HibernateDelaySec = "30min";
+    AllowSuspend = "no";
+    AllowHibernation = "yes";
+    AllowSuspendThenHibernate = "no";
+    AllowHybridSleep = "no";
   };
 
+  # Unbind/rebind driver i8042 sau resume - fix triet de ban phim LG Gram
+  powerManagement.resumeCommands = ''
+    echo -n "i8042" > /sys/bus/platform/drivers/i8042/unbind
+    echo -n "i8042" > /sys/bus/platform/drivers/i8042/bind
+  '';
 
-  # Giảm timeout systemd (mặc định 90s -> 10s) + không đợi NetworkManager (mặc định 90s -> 10s)
+  # Giảm timeout systemd (mặc định 90s -> 10s)
   systemd.settings.Manager = {
     DefaultTimeoutStartSec = "10s";
     DefaultTimeoutStopSec = "10s";
@@ -324,7 +339,6 @@
     enable = true;
     powerOnBoot = false;
   };
-
 
   services.printing.enable = true;
   services.pulseaudio.enable = false;
