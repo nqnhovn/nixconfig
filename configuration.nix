@@ -112,7 +112,7 @@
 
       # ── NixOS ──
       # build "msg" -> git add . && git commit -m "msg" && rebuild (label = slug cua msg)
-      build  = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')\" nixos-rebuild switch --flake .#lg; }; f";
+      build  = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')\" nixos-rebuild switch --flake .\#lg; }; f";
       sysupdate = "noglob sudo nixos-rebuild switch --flake ~/.config/nixos/#lg";
       hmupdate  = "home-manager switch --flake ~/.config/nixos/#lg";
       # clean -> liet ke generation, chon xoa, don rac
