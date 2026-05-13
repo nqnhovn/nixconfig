@@ -14,7 +14,7 @@
     consoleMode = "auto";
   };
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.timeout = 3; # Chỉ đợi 3 giây khi boot
+  boot.loader.timeout = lib.mkDefault 3; # Chỉ đợi 3 giây khi boot
 
   # ── Kernel mới nhất ───────────────────────────────────────────────────
   boot.kernelPackages = pkgs.linuxPackages_latest;
