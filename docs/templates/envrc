@@ -1,3 +1,2 @@
-source_url "https://raw.githubusercontent.com/cachix/devenv/HEAD/direnvrc" "sha256-YBzqskFZxmNb3kYVoKD9ZixoPXJh1C9ZvTL6kauML2o="
-
-use devenv
+watch_file devenv.nix devenv.lock
+dotenv_if_exists .env

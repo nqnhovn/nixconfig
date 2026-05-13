@@ -8,45 +8,37 @@
 
 ```bash
 # Clone (hoặc tải ZIP) → extract vào ~/.config/nixos/
-sudo bash ~/.config/nixos/initial.sh   # Bootstrap
+sudo bash ~/.config/nixos/initial.sh   # Bootstrap: detect hardware + tạo host + cài git
 make switch                             # Build & áp dụng
 ```
 
-`initial.sh` sẽ cài git/make → khởi tạo repo → tạo hardware.nix → mở Dashboard.
+`initial.sh` tự động quét phần cứng (`lspci -nn`, `lsblk`, `findmnt`) → tạo `hardware.nix` + `Hardware.md`.
 
 ---
 
-## 🎮 Makefile
+## 🎮 Hàng ngày
 
 ```bash
-make              # Dashboard tương tác
-make switch       # Rebuild toàn bộ hệ thống + git sync + push
-make home         # Chỉ rebuild Home Manager
-make gc           # Dọn rác Nix store
-make update       # Cập nhật flake.lock
-make storage      # Xem dung lượng
+make              # Dashboard tương tác (xem generations, chọn, xóa, reboot)
+switch            # devenv script: rebuild + git sync + push
+home              # devenv script: rebuild user config
+gc                # Dọn rác
+fmt               # Format code Nix
 ```
 
 ## ⌨️ Zsh Aliases
 
 | Alias | Chức năng |
 |-------|-----------|
-| `build "msg"` | git add/commit → rebuild → push |
+| `build "msg"` | git add/commit (label=slug+git-hash) → rebuild → push |
 | `sysupdate` | Auto-commit nếu dirty → rebuild → push |
-| `appupdate` | Auto-commit nếu dirty → home-manager switch |
+| `appupdate` | Auto-commit nếu dirty → rebuild user config |
 | `clean` | Liệt kê generations → chọn xóa → GC |
 | `d` / `dco` | `podman` / `podman-compose` |
 | `g` / `gs` / `ga` / `gc` / `gp` / `gl` / `gd` | Git shortcuts |
-| `dev` / `nrs` / `nrd` / `nrw` | `devbox` / `npm run …` |
+| `dev` / `nrs` / `nrd` / `nrw` | `devenv` / `npm run …` |
 | `z` | `zoxide` (cd thông minh) |
-| `v` | `vim` |
 | `..` / `...` | `cd ..` / `cd ../..` |
-
-| Phím tắt | Chức năng |
-|----------|-----------|
-| `Esc` `Esc` | Thêm `sudo` vào đầu dòng |
-| `Ctrl+T` | FZF tìm file |
-| `Ctrl+R` | FZF tìm lịch sử |
 
 ---
 
@@ -54,74 +46,76 @@ make storage      # Xem dung lượng
 
 ```
 ~/.config/nixos/
-├── Makefile              # Build system + Dashboard
-├── initial.sh            # Bootstrap script
-├── flake.nix             # Entry point
+├── flake.nix              # Entry point
+├── devenv.nix             # Dev environment + scripts
+├── Makefile               # Dashboard tương tác
+├── initial.sh             # Bootstrap + auto hardware detect
+├── .envrc                 # Direnv (PATH_add)
 ├── README.md
-├── docs/                 # 📚 Tài liệu
-│   ├── nixos-concepts.md
-│   ├── devbox-direnv.md
+├── docs/                  # 📚 Tài liệu + templates
+│   ├── devenv-direnv.md   # Devenv workflow
 │   ├── podman-distrobox.md
-│   └── templates/        # .envrc, devbox.json
-├── hosts/lg/             # 🖥️  Per-machine
+│   ├── nixos-concepts.md
+│   └── templates/         # devenv.nix + .envrc cho PHP/Go/Vue
+├── hosts/lg/              # 🖥️  Per-machine
 │   ├── default.nix
-│   └── hardware.nix
-├── modules/system/       # ⚙️  7 system modules
-└── home/                 # 🏠  6 home-manager modules
+│   ├── hardware.nix       # Auto-generated
+│   └── Hardware.md        # Hardware report
+├── modules/system/        # ⚙️  7 modules
+└── home/                  # 🏠  6 Home Manager modules
 ```
 
 ---
 
-## 🔋 Tính năng chính
+## 🔋 Pin & Hiệu năng
 
-| Hạng mục | Chi tiết |
-|----------|----------|
-| **Pin** | TLP 16+ thiết lập, CPU max 60% on bat, PCIe powersupersave |
-| **Boot** | systemd-boot + systemd initrd + Plymouth (logo LG, không chữ) |
-| **Ngủ** | **Chỉ Hibernate** (không suspend) — fix bàn phím LG Gram |
-| **GPU** | NVIDIA PRIME offload — GPU tắt khi không dùng, chỉ 3W idle |
-| **Bluetooth** | KHÔNG tự bật khi khởi động |
-| **Shell** | Zsh + Starship + Autosuggestions + Syntax Highlighting |
-| **Dev** | Devbox + Direnv + Distrobox + Podman |
-| **Editor** | Zed (Agent right, Files left) + Vim |
-| **Browser** | Firefox — tối ưu pin + bảo mật + DNS-over-HTTPS |
-| **Tiếng Việt** | Fcitx5 + Unikey |
+| Hạng mục | Trên sạc | Trên pin |
+|----------|----------|----------|
+| CPU Governor | `performance` | `powersave` |
+| CPU Boost | Bật | **Tắt** |
+| CPU Max | 100% | **60%** |
+| Intel GPU | Mặc định | **300-650MHz** |
+| NVMe | Mặc định | **lowest power** |
+| PCIe ASPM | `default` | `powersupersave` |
+| WiFi / USB / Sound | Tắt | Powersave ON |
+
+- **NVIDIA**: PRIME offload — GPU tắt khi không dùng
+- **Bluetooth**: KHÔNG tự bật khi khởi động
+- **Boot**: systemd-boot + systemd initrd + Plymouth (logo LG)
+- **Ngủ**: **Hibernate** (không suspend) — fix bàn phím LG Gram
+- **Âm thanh**: Legacy HDA (SOF driver blacklisted)
 
 ---
 
-## 📦 Dev Workflow
+## 🛠 Dev với Devenv
 
-Không cài PHP/Go/Node system-wide. Mỗi dự án có `devbox.json` + `.envrc` riêng:
+Không cài PHP/Go/Node system-wide. Mỗi dự án có `devenv.nix`:
 
 ```bash
-cd my-laravel-project   # direnv tự kích hoạt devbox shell
-php artisan serve       # PHP 8.3, Composer đã sẵn sàng
-cd ..                   # Môi trường tự hủy
+mkdir my-project && cd my-project
+cp ~/.config/nixos/docs/templates/devenv-php.nix devenv.nix
+cp ~/.config/nixos/docs/templates/envrc .envrc
+devenv up      # Khởi động MySQL/Postgres
 ```
 
-Database qua Podman:
-```bash
-podman run -d --name mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 mysql:8
-```
-
-→ Xem chi tiết: [docs/devbox-direnv.md](docs/devbox-direnv.md), [docs/podman-distrobox.md](docs/podman-distrobox.md)
+Templates có sẵn: [PHP/Laravel](docs/templates/devenv-php.nix) · [Golang](docs/templates/devenv-go.nix) · [Vue 3](docs/templates/devenv-vue.nix)
 
 ---
 
-## 🔧 Khắc phục sự cố
+## 🐛 Sự cố thường gặp
 
 | Vấn đề | Giải pháp |
 |--------|-----------|
-| Bàn phím không hoạt động sau hibernate | Đã fix: `i8042.reset` + unbind/rebind driver |
-| `zsh: bad pattern` | Đã fix: `noglob` trong alias |
-| Lỗi build | `sudo nixos-rebuild switch --rollback` |
-| `Git tree is dirty` | `git add .` hoặc dùng `sysupdate` |
+| Bàn phím không hoạt động sau hibernate | Đã fix: `i8042` unbind/rebind |
+| Không có âm thanh | Đã fix: blacklist SOF → legacy HDA |
+| `nixd` lỗi trong Zed | `make home` để cài `nixd` |
+| Build thất bại | `sudo nixos-rebuild switch --rollback` |
 
 ---
 
-## 📚 Tài liệu
+## 📚 Docs
 
 - [Khái niệm NixOS](docs/nixos-concepts.md)
-- [Devbox + Direnv](docs/devbox-direnv.md)
+- [Devenv + Direnv](docs/devenv-direnv.md)
 - [Podman + Distrobox](docs/podman-distrobox.md)
 - [Templates](docs/templates/)
