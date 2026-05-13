@@ -2,7 +2,7 @@
 # MODULES/SYSTEM/BOOT.NIX — BOOTLOADER, KERNEL, INITRD, PLYMOUTH
 # =====================================================================
 
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   # ── Bootloader ────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@
   # ── systemd initrd (nhanh hơn bash initrd ~40%) ──────────────────────
   boot.initrd.systemd = {
     enable = true;
-    emergencyAccess = false;
+    emergencyAccess = lib.mkDefault false;
     tpm2.enable = false;
   };
 
