@@ -7,7 +7,7 @@
 #
 # Kịch bản: Máy NixOS mới cài, chưa có git, chưa có gì.
 # Tải repo này về (ZIP), extract vào ~/.config/nixos/, chạy script này.
-# Script sẽ hỏi hostname → detect hardware → tạo config → cài git/make.
+# Script sẽ hỏi hostname → detect hardware → tạo config → cài git.
 # =============================================================================
 set -euo pipefail
 
@@ -400,12 +400,6 @@ if ! command -v git &>/dev/null; then
 fi
 command -v git &>/dev/null && echo -e "  ${GREEN}git: OK${NC}" || echo -e "  ${YELLOW}git: sẽ dùng từ nix-shell${NC}"
 
-if ! command -v gnumake &>/dev/null && ! command -v make &>/dev/null; then
-  echo -e "  ${YELLOW}Đang cài gnumake...${NC}"
-  nix profile install nixpkgs#gnumake 2>/dev/null || nix-env -iA nixos.gnumake 2>/dev/null || true
-fi
-command -v make &>/dev/null && echo -e "  ${GREEN}make: OK${NC}" || echo -e "  ${YELLOW}make: sẽ dùng từ nix-shell${NC}"
-
 # ── Step 4: Git init ──────────────────────────────────────────────────────
 echo ""
 echo -e "${BOLD}[4/6] Khởi tạo git repository...${NC}"
@@ -428,7 +422,7 @@ fi
 echo ""
 echo -e "${BOLD}[6/6] Chuẩn bị & chạy Makefile...${NC}"
 chown -R "$REAL_USER:users" "$CONFIG_DIR" 2>/dev/null || true
-chmod +x "$CONFIG_DIR/initial.sh" "$CONFIG_DIR/search.py" "$CONFIG_DIR/Makefile" 2>/dev/null || true
+chmod +x "$CONFIG_DIR/initial.sh" "$CONFIG_DIR/search.py" 2>/dev/null || true
 
 echo ""
 echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
