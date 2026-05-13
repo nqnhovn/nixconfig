@@ -1,4 +1,5 @@
 /home/nqnhovn/.config/nixos/.devenv/bootstrap/bootstrapLib.nix
 /home/nqnhovn/.config/nixos/.devenv/bootstrap/default.nix
+/home/nqnhovn/.config/nixos/devenv.lock
 /home/nqnhovn/.config/nixos/devenv.nix
 /home/nqnhovn/.config/nixos/.env

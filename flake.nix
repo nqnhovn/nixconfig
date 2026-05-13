@@ -33,21 +33,26 @@
       };
     };
 
+    # Cấu hình tạo file ISO sử dụng bộ cài đồ họa (Calamares) mặc định của NixOS
     packages.x86_64-linux.iso = nixos-generators.nixosGenerate {
       system = "x86_64-linux";
       format = "install-iso";
       modules = [
-        ./hosts/lg/default.nix
-        ({ ... }: {
-          boot.supportedFilesystems = nixpkgs.lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" "ext4" ];
+        # Import profile bộ cài đồ họa mặc định (GNOME/Calamares) của NixOS
+        "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-gnome.nix"
+
+        # Tích hợp cấu hình phần cứng và hệ thống cơ bản vào ISO (nếu muốn)
+        # ./hosts/lg/default.nix
+
+        ({ lib, ... }: {
+          nixpkgs.config.allowUnfree = true;
+
+          # Đảm bảo các tính năng cần thiết cho bộ cài
+          isoImage.editionName = lib.mkForce "standard-installer";
+
+          # Cho phép cài đặt thông qua giao diện đồ họa Calamares
+          system.stateVersion = "25.11";
         })
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.backupFileExtension = "backup";
-          home-manager.users.nqnhovn = import ./home/default.nix;
-        }
       ];
     };
   };
