@@ -38,6 +38,9 @@
       format = "install-iso";
       modules = [
         ./hosts/lg/default.nix
+        ({ ... }: {
+          boot.supportedFilesystems = nixpkgs.lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" "ext4" ];
+        })
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
