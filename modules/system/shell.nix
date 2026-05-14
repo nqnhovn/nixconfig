@@ -18,9 +18,7 @@
       "HIST_FIND_NO_DUPS"
       "HIST_IGNORE_SPACE"
     ];
-    initExtra = ''
-      eval "$(devenv shell-hook)"
-    '';
+
     interactiveShellInit = ''
       source ${pkgs.fzf}/share/fzf/key-bindings.zsh
       source ${pkgs.fzf}/share/fzf/completion.zsh
@@ -89,6 +87,8 @@
 
   programs.zoxide.enable = true;
   programs.direnv.enable = true;
-  programs.direnv.nix-direnv.enable = true;
+  programs.direnv.nix-direnv = {
+    enable = false; # Vô hiệu hóa nix-direnv để sử dụng devenv shell trực tiếp
+  };
   programs.starship.enable = true;
 }

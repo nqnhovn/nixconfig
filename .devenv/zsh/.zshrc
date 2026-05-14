@@ -20,7 +20,7 @@ autoload -Uz add-zsh-hook
 
 __devenv_reload_apply() {
     # Source new environment if a reload is pending
-    if [ -f "/tmp/devenv-reload-11974.sh" ]; then
+    if [ -f "/tmp/devenv-reload-26114.sh" ]; then
         # Shell out to bash to handle the env diff (bash syntax)
         local reload_output
         reload_output=$(bash -c '
@@ -155,8 +155,8 @@ _before=$(mktemp)
 __devenv_capture_env > "$_before"
 
 # Source new devenv environment
-source "/tmp/devenv-reload-11974.sh"
-rm -f "/tmp/devenv-reload-11974.sh"
+source "/tmp/devenv-reload-26114.sh"
+rm -f "/tmp/devenv-reload-26114.sh"
 
 # Compute new diff
 __devenv_compute_diff "$_before"

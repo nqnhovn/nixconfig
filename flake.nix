@@ -46,6 +46,7 @@
 
     # Định nghĩa một devShell mặc định cho Flake, sử dụng devenv.nix
     devShells.${system}.default = devenv.lib.mkShell {
+      inherit inputs pkgs; # Pass inputs and pkgs directly to mkShell
       modules = [
         (import ./devenv.nix { inherit pkgs inputs; }) # Pass pkgs and inputs explicitly to the imported devenv.nix
       ];

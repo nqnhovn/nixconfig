@@ -73,6 +73,8 @@
   # ── Nix settings ──────────────────────────────────────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
+  # Thêm người dùng hiện tại vào trusted-users để devenv không báo lỗi
+  nix.settings.trusted-users = [ "root" "nqnhovn" ];
   nixpkgs.config.allowUnfree = true;
 
   # Auto GC hàng tuần — xóa generations > 7 ngày
