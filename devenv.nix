@@ -21,18 +21,5 @@
   scripts.list.exec = "sudo nix-env --list-generations -p /nix/var/nix/profiles/system";
   scripts.clean.exec = "sudo nix-collect-garbage -d && sudo nix-env --list-generations -p /nix/var/nix/profiles/system";
 
-  enterShell = ''
-    echo "❄️  NixOS Config — devenv $(devenv version 2>/dev/null || echo '?')"
-    echo ""
-    echo "  Scripts:"
-    echo "    switch   → rebuild + apply (tương đương update alias)"
-    echo "    build    → build boot (không switch ngay)"
-    echo "    gc       → dọn rác hệ thống (garbage collect)"
-    echo "    update   → cập nhật flake.lock"
-    echo "    fmt      → format code .nix"
-    echo "    check    → kiểm tra lỗi script initial.sh"
-    echo "    list     → liệt kê các thế hệ (generations)"
-    echo "    clean    → dọn rác + liệt kê generations"
-    echo ""
-  '';
+  enterShell = '';
 }
