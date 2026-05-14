@@ -14,7 +14,7 @@
     fd                # find nhanh hơn
     nixd              # Nix Language Server cho Zed
     # appflowy
-    reno
-    gnote
+    # reno
+    # gnote
   ];
 }

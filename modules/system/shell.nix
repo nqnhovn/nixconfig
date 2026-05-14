@@ -3,13 +3,14 @@
 # =====================================================================
 
 { pkgs, ... }:
-
+# programs.zsh.initExtra = ''
+#   eval "$(devenv shell-hook)"
+# '';
 {
   programs.zsh = {
     enable = true;
     autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
-
     histSize = 10000;
     setOptions = [
       "HIST_IGNORE_DUPS"
@@ -17,7 +18,9 @@
       "HIST_FIND_NO_DUPS"
       "HIST_IGNORE_SPACE"
     ];
-
+    initExtra = ''
+      eval "$(devenv shell-hook)"
+    '';
     interactiveShellInit = ''
       source ${pkgs.fzf}/share/fzf/key-bindings.zsh
       source ${pkgs.fzf}/share/fzf/completion.zsh

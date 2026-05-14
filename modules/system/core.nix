@@ -96,6 +96,7 @@
     zsh-completions
     gnomeExtensions.caffeine
     gnomeExtensions.appindicator
+    devenv # Cài đặt devenv ở cấp độ hệ thống
   ];
 
   environment.gnome.excludePackages = with pkgs; [
