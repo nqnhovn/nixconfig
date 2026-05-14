@@ -73,8 +73,8 @@
       CPU_MIN_PERF_ON_BAT = 0;
       PCIE_ASPM_ON_AC = "default";
       PCIE_ASPM_ON_BAT = "powersupersave";
-      WIFI_PWR_ON_AC = "off";
-      WIFI_PWR_ON_BAT = "on";
+      WIFI_PWR_ON_AC = "on";  # Set to 'on' for full performance when on AC
+      WIFI_PWR_ON_BAT = "off"; # Set to 'off' for power saving when on battery
       USB_AUTOSUSPEND = 1;
       USB_AUTOSUSPEND_DISABLE_ON_SHUTDOWN = 1;
       USB_DENYLIST = "046d:c318 046d:c52b";

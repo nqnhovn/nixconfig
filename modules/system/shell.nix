@@ -3,9 +3,7 @@
 # =====================================================================
 
 { pkgs, ... }:
-# programs.zsh.initExtra = ''
-#   eval "$(devenv shell-hook)"
-# '';
+
 {
   programs.zsh = {
     enable = true;
@@ -54,40 +52,25 @@
     '';
 
     shellAliases = {
-      ll = "ls -alF";
-      la = "ls -A";
-      l = "ls -CF";
-      ".." = "cd ..";
-      "..." = "cd ../..";
-
-      build = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && GIT_HASH=$(git rev-parse --short HEAD) && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')-$GIT_HASH\" nixos-rebuild switch --flake .\\#lg && git push; }; f";
-      sysupdate = "noglob f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d\\ %H:%M)\"; fi; GIT_HASH=$(git rev-parse --short HEAD); sudo NIXOS_LABEL=\"sysupdate-$(date +%Y%m%d-%H%M)-$GIT_HASH\" nixos-rebuild switch --flake .\\#lg && git push; }; f";
-      appupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"appupdate: $(date +%Y-%m-%d\\ %H:%M)\"; fi; home-manager switch --flake .\\#lg; }; f";
+      # ── System / NixOS Aliases (Global) ───────────────────────────────────
+      # These are global aliases for system-wide NixOS management.
+      # devenv-specific commands are in devenv.nix scripts block.
+      build = "noglob f() { cd ~/.config/nixos && git add . && git commit -m \"$1\" && GIT_HASH=$(git rev-parse --short HEAD) && sudo NIXOS_LABEL=\"$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')-$GIT_HASH\" nixos-rebuild switch --flake .#lg && git push; }; f";
+      sysupdate = "noglob f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d %H:%M)\"; fi; GIT_HASH=$(git rev-parse --short HEAD); sudo NIXOS_LABEL=\"sysupdate-$(date +%Y%m%d-%H%M)-$GIT_HASH\" nixos-rebuild switch --flake .#lg && git push; }; f";
+      appupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"appupdate: $(date +%Y-%m-%d %H:%M)\"; fi; home-manager switch --flake .#lg; }; f";
       clean = "f() { echo '=== Cac the he hien tai ==='; sudo nix-env --list-generations --profile /nix/var/nix/profiles/system; echo ''; echo -n 'Nhap so gen muon xoa (Enter de bo qua): '; read -r gens; if [ -n \"$gens\" ]; then for g in $(echo $gens); do sudo nix-env --delete-generations $g --profile /nix/var/nix/profiles/system; done; echo 'Da xoa.'; fi; echo 'Dang don rac...'; sudo nix-collect-garbage -d; echo 'Hoan tat!'; }; f";
 
-      dco = "podman-compose";
-      d = "podman";
-      v = "vim";
-
-      g = "git";
-      gs = "git status";
-      ga = "git add";
-      gc = "git commit -m";
-      gp = "git push";
-      gl = "git log --oneline --graph --all";
-      gd = "git diff";
-
-      # ── Navigation aliases ────────────────────────────────────────────────
+      # ── Navigation Aliases ────────────────────────────────────────────────
       ".." = "cd ..";
       "..." = "cd ../..";
-      z = "zoxide"; # zoxide (cd thông minh)
+      z = "zoxide"; # zoxide (smart cd)
 
-      # ── Listing aliases ───────────────────────────────────────────────────
+      # ── Listing Aliases ───────────────────────────────────────────────────
       ll = "ls -alF";
       la = "ls -A";
       l = "ls -CF";
 
-      # ── Git aliases ───────────────────────────────────────────────────────
+      # ── Git Aliases ───────────────────────────────────────────────────────
       g = "git";
       gs = "git status";
       ga = "git add";
@@ -96,15 +79,12 @@
       gl = "git log --oneline --graph --all";
       gd = "git diff";
 
-      # ── Podman/Docker aliases ─────────────────────────────────────────────
+      # ── Podman/Docker Aliases ─────────────────────────────────────────────
       dco = "podman-compose";
       d = "podman";
 
-      # ── Other utility aliases ─────────────────────────────────────────────
-      v = "vim"; # Alias cho vim (nếu bạn dùng)
-
-      # NOTE: devenv aliases (dev, devup, devgc, etc.) are now in devenv.nix scripts block.
-      # npm aliases (nrs, nrd, nrw) should be managed within devenv environments.
+      # ── Other Utility Aliases ─────────────────────────────────────────────
+      v = "vim"; # Alias for vim
     };
   };
 
