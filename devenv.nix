@@ -9,6 +9,7 @@
     eza
     fd
     jq
+    nixos-rebuild # Cần có để các script switch/build hoạt động
   ];
 
   # ── Scripts quản lý NixOS ──────────────────────────────────────────
@@ -38,5 +39,18 @@
 
   }; # Kết thúc block scripts
 
-  enterShell = "";
+  # enterShell = ""; # This is for `devenv shell` interactive prompt
+  # shellHook is implicitly handled when defining `scripts` and `packages`
+
+  # Debugging shellHook (if still needed, can be placed here or in a devShell module)
+  # shellHook = ''
+  #   echo "--- Devenv Shell Hook Debug ---"
+  #   echo "PATH: $PATH"
+  #   if command -v switch &> /dev/null; then
+  #     echo " 'switch' command is available."
+  #   else
+  #     echo " 'switch' command is NOT available."
+  #   fi
+  #   echo "-----------------------------"
+  # '';
 }
