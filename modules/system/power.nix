@@ -3,21 +3,57 @@
 # LG GRAM 17 (i5-10210U Comet Lake + NVIDIA GTX 1650)
 # =====================================================================
 
-{ ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # ── Hibernate + Keyboard fix ──────────────────────────────────────────
   services.logind.settings.Login = {
-    HandleLidSwitch = "hibernate";
-    HandlePowerKey = "hibernate";
-    IdleAction = "ignore";
-    IdleActionSec = "5min";
+    HandleLidSwitch = "suspend"; # Suspend when lid is closed
+    HandlePowerKey = "suspend";  # Suspend when power key is pressed
+    IdleAction = "suspend";    # Suspend when idle
+    IdleActionSec = "10min";   # Default idle time (for AC)
   };
 
+  # ── Systemd user service to adjust IdleActionSec based on power source ──
+  systemd.user.services.power-idle-adjust = {
+    description = "Adjust logind IdleActionSec based on power source";
+    script = ''
+      export XDG_RUNTIME_DIR=/run/user/$UID # Required for systemctl --user
+      if /bin/grep -q "Discharging" /sys/class/power_supply/BAT?/status 2>/dev/null; then
+        ${pkgs.systemd}/bin/loginctl set-idle-action-delay 5min # On battery, suspend after 5 min
+      else
+        ${pkgs.systemd}/bin/loginctl set-idle-action-delay 10min # On AC, suspend after 10 min
+      fi
+    ''; # Corrected syntax: removed extra backslashes and single quotes.
+    wantedBy = [ "default.target" ];
+    path = with pkgs; [ systemd ]; # Ensure loginctl is in PATH
+  };
+
+  # Run the service on startup and whenever power supply status changes
+  systemd.user.timers.power-idle-adjust = {
+    description = "Run power-idle-adjust service periodically";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnStartupSec = "10s";
+      OnUnitActiveSec = "1min"; # Check every minute
+    };
+  };
+
+  # Script to run when resuming from any suspend state (suspend/hibernate)
   powerManagement.resumeCommands = ''
     echo -n "i8042" > /sys/bus/platform/drivers/i8042/unbind
     echo -n "i8042" > /sys/bus/platform/drivers/i8042/bind
   '';
+
+  # ── Tối ưu Suspend không sâu (s2idle) ──────────────────────────────────
+  # Ưu tiên chế độ suspend s2idle (sleep không sâu) để cải thiện khả năng đánh thức bàn phím
+  boot.kernelParams = [ "mem_sleep_default=s2idle" ]; # Thiết lập mem_sleep_default=s2idle
+
+  # Đảm bảo các driver cần thiết không bị tắt quá sâu khi suspend
+  # (nếu vẫn gặp vấn đề, có thể thêm các driver khác vào đây)
+  # Lưu ý: powerOffModules chỉ áp dụng cho khi hệ thống tắt, không phải suspend.
+  # Thay vào đó, chúng ta sẽ dựa vào các tinh chỉnh của TLP hoặc các giải pháp khác.
+  # powerManagement.powerOffModules = [ "xhci_hcd" ]; # USB controller driver (bị loại bỏ vì không phù hợp với suspend)
 
   # ── TLP: tối ưu pin toàn diện cho Comet Lake ─────────────────────────
   services.power-profiles-daemon.enable = false;

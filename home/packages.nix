@@ -3,7 +3,7 @@
 {
   home.packages = with pkgs; [
     btop
-    devenv
+    # devenv
     gh
     vim
     zed-editor
