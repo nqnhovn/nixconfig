@@ -77,11 +77,34 @@
       gl = "git log --oneline --graph --all";
       gd = "git diff";
 
-      dev = "devenv";
-      nrs = "npm run serve";
-      nrd = "npm run dev";
-      nrw = "npm run watch";
-      z = "zoxide";
+      # ── Navigation aliases ────────────────────────────────────────────────
+      ".." = "cd ..";
+      "..." = "cd ../..";
+      z = "zoxide"; # zoxide (cd thông minh)
+
+      # ── Listing aliases ───────────────────────────────────────────────────
+      ll = "ls -alF";
+      la = "ls -A";
+      l = "ls -CF";
+
+      # ── Git aliases ───────────────────────────────────────────────────────
+      g = "git";
+      gs = "git status";
+      ga = "git add";
+      gc = "git commit -m";
+      gp = "git push";
+      gl = "git log --oneline --graph --all";
+      gd = "git diff";
+
+      # ── Podman/Docker aliases ─────────────────────────────────────────────
+      dco = "podman-compose";
+      d = "podman";
+
+      # ── Other utility aliases ─────────────────────────────────────────────
+      v = "vim"; # Alias cho vim (nếu bạn dùng)
+
+      # NOTE: devenv aliases (dev, devup, devgc, etc.) are now in devenv.nix scripts block.
+      # npm aliases (nrs, nrd, nrw) should be managed within devenv environments.
     };
   };
 
