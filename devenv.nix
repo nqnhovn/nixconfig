@@ -21,5 +21,5 @@
   scripts.list.exec = "sudo nix-env --list-generations -p /nix/var/nix/profiles/system";
   scripts.clean.exec = "sudo nix-collect-garbage -d && sudo nix-env --list-generations -p /nix/var/nix/profiles/system";
 
-  enterShell = '';
+  enterShell = "";
 }
