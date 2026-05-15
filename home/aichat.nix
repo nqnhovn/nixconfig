@@ -10,7 +10,7 @@
   xdg.configFile."aichat/config.yaml" = {
     text = ''
       # Aichat Configuration - DeepSeek + Gemini
-      model: deepseek-chat
+      model: deepseek:deepseek-chat
       temperature: 0.7
       top_p: 1.0
       save_session: true
@@ -30,10 +30,6 @@
               max_input_tokens: 65536
             - name: deepseek-reasoner
               max_input_tokens: 65536
-          extra:
-            {
-              "OPENAI_API_KEY": "sk-739376dce72f49ad832167488671b396",
-            }
 
         # ── Google Gemini ─────────────────────────────────────────
         - name: gemini
