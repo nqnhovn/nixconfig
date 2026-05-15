@@ -33,8 +33,10 @@ Dashboard TUI chuyên nghiệp quản lý generations:
 
 - **B/b: Build** — Nhập Label → git add & commit → tạo gen → hỏi pin profile → git push
 - **D/d: Delete** — Nhập ID gen → xóa + GC
-- **S/s: Switch** — Rollback về gen bất kỳ
+- **S/s: Switch** — Rollback về gen bất kỳ + git checkout commit tương ứng
 - **H/h: Home** — Rebuild Home Manager
+- **C/c: Clean** — Xóa tất cả gen, chỉ giữ N gen gần nhất (mặc định: 3)
+- **R/r: Reset** — Tạo profile mới, reset gen counter về 1
 - **E/e: Exit** — Thoát
 
 ---
@@ -59,17 +61,22 @@ Dashboard TUI chuyên nghiệp quản lý generations:
 
 ## 🤖 AI & LLM
 
-| Công cụ | Vai trò | Mô hình |
-|---------|---------|---------|
-| **Aichat** | Chat CLI với DeepSeek + Gemini | `deepseek-chat`, `gemini-2.5-flash` |
-| **Ollama** | LLM local (CUDA accelerated) | `tinyllama`, `llama3.2:1b` |
+### Aichat — [github.com/sigoden/aichat](https://github.com/sigoden/aichat)
 
-Ollama chạy nhẹ trên laptop: 1 model loaded, keep-alive 5 phút, GPU NVIDIA GTX 1650.
+Chat CLI đa năng, hỗ trợ 20+ provider. Cấu hình trong [`home/aichat.nix`](home/aichat.nix):
+
+| Provider | Model | Dùng cho |
+|----------|-------|----------|
+| **DeepSeek** | `deepseek-chat` | Chat hàng ngày, code review |
+| **DeepSeek** | `deepseek-reasoner` | Suy luận phức tạp |
+| **Google Gemini** | `gemini-2.5-flash` | Nhanh, context 1M token |
+| **Google Gemini** | `gemini-2.5-pro` | Mạnh nhất của Google |
 
 ```bash
-aichat                        # Chat với AI (CLI)
-ollama run tinyllama           # Chạy model local
-ollama list                    # Danh sách model đã tải
+aichat                                 # Chat CLI - mặc định DeepSeek
+aichat -m gemini:gemini-2.5-flash        # Dùng Gemini
+aichat -f code.py                       # Chat về file code
+aichat --list-models                    # Danh sách model khả dụng
 ```
 
 ---
@@ -117,7 +124,7 @@ ollama list                    # Danh sách model đã tải
 | PCIe ASPM | `default` | `powersupersave` |
 | WiFi / USB / Sound | Tắt | Powersave ON |
 
-- **NVIDIA**: PRIME offload — GPU tắt khi không dùng (Ollama dùng CUDA khi cần)
+- **NVIDIA**: PRIME offload — GPU tắt khi không dùng
 - **Bluetooth**: KHÔNG tự bật khi khởi động
 - **Boot**: systemd-boot + systemd initrd + Plymouth (logo LG)
 - **Ngủ**: **Hibernate** (không suspend) — fix bàn phím LG Gram
@@ -148,7 +155,6 @@ Templates có sẵn: [PHP/Laravel](docs/templates/devenv-php.nix) · [Golang](do
 | Không có âm thanh | Đã fix: blacklist SOF → legacy HDA |
 | `nixd` lỗi trong Zed | `home` để cài `nixd` |
 | Build thất bại | `sudo nixos-rebuild switch --rollback` |
-| Ollama không có GPU | Kiểm tra `nvidia-smi`, service ollama |
 
 ---
 

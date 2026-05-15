@@ -43,7 +43,7 @@
 
       RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
       BLUE='\033[0;34m'; CYAN='\033[0;36m'; BOLD='\033[1m'
-      WHITE='\033[1;37m'; NC='\033[0m'; DIM='\033[2m'
+      WHITE='\033[1;37m'; MAGENTA='\033[1;35m'; NC='\033[0m'; DIM='\033[2m'
 
       cleanup() { echo -e "\n''${GREEN}👋 See you!''${NC}"; exit 0; }
       trap cleanup SIGINT SIGTERM
@@ -113,7 +113,8 @@
 
         echo ""
         echo -e "''${CYAN}╔══════════════════════════════════════════════════════════════╗''${NC}"
-        echo -e "''${CYAN}║''${NC}  ''${BOLD}''${GREEN}B''${NC}/b: ''${WHITE}Build''${NC}   │  ''${BOLD}''${RED}D''${NC}/d: ''${WHITE}Delete''${NC}   │  ''${BOLD}''${BLUE}S''${NC}/s: ''${WHITE}Switch''${NC}   │  ''${BOLD}''${YELLOW}H''${NC}/h: ''${WHITE}Home''${NC}   │  ''${BOLD}''${RED}E''${NC}/e: ''${WHITE}Exit''${NC}  ''${CYAN}║''${NC}"
+        echo -e "''${CYAN}║''${NC}  ''${BOLD}''${GREEN}B''${NC}/b: ''${WHITE}Build''${NC}   │  ''${BOLD}''${RED}D''${NC}/d: ''${WHITE}Delete''${NC}   │  ''${BOLD}''${BLUE}S''${NC}/s: ''${WHITE}Switch''${NC}   │  ''${BOLD}''${YELLOW}H''${NC}/h: ''${WHITE}Home''${NC}  ''${CYAN}║''${NC}"
+        echo -e "''${CYAN}║''${NC}  ''${BOLD}''${MAGENTA}C''${NC}/c: ''${WHITE}Clean''${NC}   │  ''${BOLD}''${YELLOW}R''${NC}/r: ''${WHITE}Reset''${NC}    │  ''${BOLD}''${RED}E''${NC}/e: ''${WHITE}Exit''${NC}                             ''${CYAN}║''${NC}"
         echo -e "''${CYAN}╚══════════════════════════════════════════════════════════════╝''${NC}"
         echo ""
         read -r -p "  ► " CHOICE
@@ -206,6 +207,34 @@
             fi
             home-manager switch --flake .#lg
             echo -e "  ''${GREEN}✅ Home Manager rebuild complete!''${NC}"
+            echo ""
+            read -r -p "  Press Enter to continue..." _
+            ;;
+
+          c|clean)
+            echo ""
+            read -r -p "  🧹 Keep how many recent gens? (default: 3): " KEEP
+            KEEP=''${KEEP:-3}
+            echo -e "  ''${YELLOW}Deleting all except $KEEP most recent...''${NC}"
+            sudo nix-env --delete-generations +$KEEP --profile /nix/var/nix/profiles/system
+            sudo nix-collect-garbage -d
+            echo -e "  ''${GREEN}✅ Kept $KEEP recent gens, GC done!''${NC}"
+            echo ""
+            read -r -p "  Press Enter to continue..." _
+            ;;
+
+          r|reset)
+            echo ""
+            echo -e "  ''${YELLOW}🔄 Creating fresh profile starting from gen 1...''${NC}"
+            echo -e "  ''${DIM}   Current profile preserved as backup''${NC}"
+            cd ~/.config/nixos
+            if ! git diff --quiet || ! git diff --cached --quiet; then
+              git add . && git commit -m "reset: save before profile reset"
+            fi
+            sudo nixos-rebuild switch --flake .#lg --profile-name system
+            sudo nix-collect-garbage -d
+            echo -e "  ''${GREEN}✅ New profile created! Gen counter reset to 1''${NC}"
+            echo -e "  ''${DIM}💡 Old boot entries remain until overwritten by new builds''${NC}"
             echo ""
             read -r -p "  Press Enter to continue..." _
             ;;

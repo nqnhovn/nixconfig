@@ -99,8 +99,6 @@
     gnomeExtensions.caffeine
     gnomeExtensions.appindicator
     devenv # Cài đặt devenv ở cấp độ hệ thống
-    aichat
-    ollama-cuda
   ];
 
   environment.gnome.excludePackages = with pkgs; [

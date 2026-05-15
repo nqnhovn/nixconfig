@@ -1,10 +1,15 @@
-{  pkgs, ... }:
+# =====================================================================
+# HOME/AICHAT.NIX — AICHAT CONFIG (DEEPSEEK + GEMINI)
+# 🔗 https://github.com/sigoden/aichat
+# =====================================================================
+
+{ pkgs, ... }:
 
 {
-  # Aichat configuration with DeepSeek and Google Gemini APIs
+  # Aichat configuration with DeepSeek + Google Gemini APIs
   xdg.configFile."aichat/config.yaml" = {
     text = ''
-      # Aichat Configuration - DeepSeek + Google Gemini
+      # Aichat Configuration - DeepSeek + Gemini
       model: deepseek-chat
       temperature: 0.7
       top_p: 1.0
@@ -15,6 +20,7 @@
       keybindings: vi
       prelude: []
       clients:
+        # ── DeepSeek ──────────────────────────────────────────────
         - name: deepseek
           type: openai_compatible
           api_base: https://api.deepseek.com/v1
@@ -29,6 +35,7 @@
               "OPENAI_API_KEY": "sk-739376dce72f49ad832167488671b396",
             }
 
+        # ── Google Gemini ─────────────────────────────────────────
         - name: gemini
           type: gemini
           api_key: AIzaSyBLoFoiKneKAJvQnVIfRyc9hYmTpiC-48o
