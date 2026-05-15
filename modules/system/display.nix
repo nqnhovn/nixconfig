@@ -2,7 +2,7 @@
 # MODULES/SYSTEM/DISPLAY.NIX — NVIDIA, GNOME, GDM
 # =====================================================================
 
-{ config, ... }:
+{ config, pkgs, ... }:
 
 {
   services.xserver.videoDrivers = [ "nvidia" ];
@@ -29,14 +29,17 @@
   services.desktopManager.gnome.enable = true;
 
   # ── GDM: hiện ô mật khẩu ngay, không cần click chọn user ──────
-  # GDM chạy dưới user "gdm", cần dconf profile riêng.
-  # File dconf này khiến màn hình login focus vào ô password luôn.
-  environment.etc = {
-    "dconf/profile/gdm".text = ''
+  systemd.services.gdm-dconf = {
+    description = "Setup GDM dconf for instant password prompt";
+    wantedBy = [ "display-manager.service" ];
+    before = [ "display-manager.service" ];
+    script = ''
+      mkdir -p /etc/dconf/db/gdm.d /etc/dconf/profile
+      cat > /etc/dconf/profile/gdm << 'DCONF'
       user-db:user
       system-db:gdm
-    '';
-    "dconf/db/gdm.d/00-login-screen".text = ''
+      DCONF
+      cat > /etc/dconf/db/gdm.d/00-login-screen << 'DCONF'
       [org/gnome/login-screen]
       enable-password-authentication=true
       banner-message-enable=false
@@ -46,6 +49,12 @@
 
       [org/gnome/desktop/screensaver]
       lock-enabled=false
+      DCONF
+      ${pkgs.dconf}/bin/dconf update
     '';
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
   };
 }
