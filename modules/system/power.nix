@@ -19,14 +19,14 @@
     description = "Adjust logind IdleActionSec based on power source";
     script = ''
       export XDG_RUNTIME_DIR=/run/user/$UID # Required for systemctl --user
-      if /bin/grep -q "Discharging" /sys/class/power_supply/BAT?/status 2>/dev/null; then
+      if grep -q "Discharging" /sys/class/power_supply/BAT?/status 2>/dev/null; then
         ${pkgs.systemd}/bin/loginctl set-idle-action-delay 5min # On battery, suspend after 5 min
       else
         ${pkgs.systemd}/bin/loginctl set-idle-action-delay 10min # On AC, suspend after 10 min
       fi
     ''; # Corrected syntax: removed extra backslashes and single quotes.
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ systemd ]; # Ensure loginctl is in PATH
+    path = with pkgs; [ systemd gnugrep ]; # Ensure loginctl is in PATH
   };
 
   # Run the service on startup and whenever power supply status changes
