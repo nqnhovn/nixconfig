@@ -39,6 +39,7 @@
               home-manager.useUserPackages = true;
               home-manager.backupFileExtension = "backup";
               home-manager.users.nqnhovn = import ./home/default.nix;
+              system.configurationRevision = self.rev or "dirty";
             }
           ];
         };

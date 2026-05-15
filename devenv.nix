@@ -180,6 +180,18 @@
               sudo nix-env --switch-generation "$GEN_ID" --profile /nix/var/nix/profiles/system
               sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
               echo -e "  ''${GREEN}✅ Switched to gen $GEN_ID!''${NC}"
+              REV=$(cat /run/current-system/configuration-revision 2>/dev/null || true)
+              if [ -n "$REV" ] && [ "$REV" != "dirty" ] && [ "$REV" != "unknown" ]; then
+                echo -e "  ''${YELLOW}📋 Config revision: ''${BOLD}$REV''${NC}"
+                cd ~/.config/nixos
+                if git cat-file -t "$REV" >/dev/null 2>&1; then
+                  git checkout "$REV" 2>/dev/null && echo -e "  ''${GREEN}✅ Git checkout $REV''${NC}" || echo -e "  ''${DIM}⚠️  Dirty repo, staying on current''${NC}"
+                else
+                  echo -e "  ''${DIM}⚠️  Revision $REV not in git history''${NC}"
+                fi
+              else
+                echo -e "  ''${DIM}⚠️  No revision stored in this gen (pre-dashboard build)''${NC}"
+              fi
             fi
             echo ""
             read -r -p "  Press Enter to continue..." _

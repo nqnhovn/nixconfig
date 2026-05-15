@@ -9,7 +9,7 @@
 ```bash
 # Clone (hoặc tải ZIP) → extract vào ~/.config/nixos/
 sudo bash ~/.config/nixos/initial.sh   # Bootstrap: detect hardware + tạo host + cài git
-mgr                                     # Mở Dashboard quản lý generations
+nixos                                     # Mở Dashboard quản lý generations
 ```
 
 `initial.sh` tự động quét phần cứng (`lspci -nn`, `lsblk`, `findmnt`) → tạo `hardware.nix` + `Hardware.md`.
@@ -19,7 +19,7 @@ mgr                                     # Mở Dashboard quản lý generations
 ## 🎮 Hàng ngày
 
 ```bash
-mgr               # 🖥️  Dashboard tương tác (Build, Delete, Switch, Home, Exit)
+nixos               # 🖥️  Dashboard tương tác (Build, Delete, Switch, Home, Exit)
 switch            # devenv script: nixos-rebuild switch
 boot              # devenv script: build (không switch)
 home              # devenv script: rebuild user config
@@ -27,7 +27,7 @@ gc                # Dọn rác nix store
 fmt               # Format code Nix
 ```
 
-## 🖥️ Dashboard (mgr / dashboard)
+## 🖥️ Dashboard (nixos / dashboard)
 
 Dashboard TUI chuyên nghiệp quản lý generations:
 
@@ -43,7 +43,7 @@ Dashboard TUI chuyên nghiệp quản lý generations:
 
 | Alias | Chức năng |
 |-------|-----------|
-| `mgr` | Mở Dashboard quản lý generations |
+| `nixos` | Mở Dashboard quản lý generations |
 | `build "msg"` | Quick rebuild với label (non-interactive) |
 | `sysupdate` | Auto-commit nếu dirty → rebuild → push |
 | `appupdate` | Auto-commit nếu dirty → rebuild user config |

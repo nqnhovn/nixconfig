@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{  pkgs, ... }:
 
 {
   # Aichat configuration with DeepSeek and Google Gemini APIs
