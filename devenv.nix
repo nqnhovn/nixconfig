@@ -59,7 +59,7 @@
         CURRENT_GEN=$(sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | grep "(current)" | awk '{print $1}')
         GEN_COUNT=$(sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | wc -l)
         NIXOS_VER=$(nixos-version 2>/dev/null || echo "NixOS")
-        UPTIME=$(uptime -p | sed 's/up //')
+        UPTIME=$(awk '{d=int($1/86400); h=int($1%86400/3600); m=int($1%3600/60); if(d) printf "%dd ", d; printf "%dh %dm", h, m}' /proc/uptime)
 
         echo -e "  ''${DIM}System:''${NC} ''${BOLD}''${NIXOS_VER}''${NC}  │  ''${DIM}Uptime:''${NC} ''${UPTIME}  │  ''${DIM}Generations:''${NC} ''${BOLD}''${GEN_COUNT}''${NC}  │  ''${DIM}Current:''${NC} ''${GREEN}#''${CURRENT_GEN}''${NC}"
         echo -e "''${CYAN}╟──────────────────────────────────────────────────────────────╢''${NC}"
