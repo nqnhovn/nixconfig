@@ -1,3 +1,13 @@
 devbox.lock
 .direnv/
 .devenv/
+result
+result-*
+*.pyc
+__pycache__
+.direnv
+*.swp
+*.swo
+*~
+.env
+.env.local

@@ -36,4 +36,17 @@
     ];
     fcitx5.waylandFrontend = true;
   };
+
+  services.ollama = {
+    enable = true;
+    package = pkgs.ollama-cuda;
+    host = "127.0.0.1";
+    port = 11434;
+    loadModels = [ "tinyllama" "llama3.2:1b" ];
+    environmentVariables = {
+      OLLAMA_NUM_PARALLEL = "1";
+      OLLAMA_MAX_LOADED_MODELS = "1";
+      OLLAMA_KEEP_ALIVE = "5m";
+    };
+  };
 }

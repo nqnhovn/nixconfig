@@ -13,5 +13,6 @@
     ./firefox.nix
     ./zed.nix
     ./gnome.nix
+    ./aichat.nix
   ];
 }

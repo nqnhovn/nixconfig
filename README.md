@@ -1,6 +1,6 @@
 # ❄️ NixOS Configuration — LG Gram 17 (17U70N)
 
-**NixOS 25.11 · GNOME 49 + Wayland · Intel i5-10210U + NVIDIA GTX 1650**
+**NixOS 26.05 · GNOME 49 + Wayland · Intel i5-10210U + NVIDIA GTX 1650**
 
 ---
 
@@ -9,7 +9,7 @@
 ```bash
 # Clone (hoặc tải ZIP) → extract vào ~/.config/nixos/
 sudo bash ~/.config/nixos/initial.sh   # Bootstrap: detect hardware + tạo host + cài git
-make switch                             # Build & áp dụng
+mgr                                     # Mở Dashboard quản lý generations
 ```
 
 `initial.sh` tự động quét phần cứng (`lspci -nn`, `lsblk`, `findmnt`) → tạo `hardware.nix` + `Hardware.md`.
@@ -19,26 +19,58 @@ make switch                             # Build & áp dụng
 ## 🎮 Hàng ngày
 
 ```bash
-make              # Dashboard tương tác (xem generations, chọn, xóa, reboot)
-switch            # devenv script: rebuild + git sync + push
+mgr               # 🖥️  Dashboard tương tác (Build, Delete, Switch, Home, Exit)
+switch            # devenv script: nixos-rebuild switch
+boot              # devenv script: build (không switch)
 home              # devenv script: rebuild user config
-gc                # Dọn rác
+gc                # Dọn rác nix store
 fmt               # Format code Nix
 ```
+
+## 🖥️ Dashboard (mgr / dashboard)
+
+Dashboard TUI chuyên nghiệp quản lý generations:
+
+- **B/b: Build** — Nhập Label → git add & commit → tạo gen → hỏi pin profile → git push
+- **D/d: Delete** — Nhập ID gen → xóa + GC
+- **S/s: Switch** — Rollback về gen bất kỳ
+- **H/h: Home** — Rebuild Home Manager
+- **E/e: Exit** — Thoát
+
+---
 
 ## ⌨️ Zsh Aliases
 
 | Alias | Chức năng |
 |-------|-----------|
-| `build "msg"` | git add/commit (label=slug+git-hash) → rebuild → push |
+| `mgr` | Mở Dashboard quản lý generations |
+| `build "msg"` | Quick rebuild với label (non-interactive) |
 | `sysupdate` | Auto-commit nếu dirty → rebuild → push |
 | `appupdate` | Auto-commit nếu dirty → rebuild user config |
-| `clean` | Liệt kê generations → chọn xóa → GC |
+| `gen` | Liệt kê generations |
+| `clean` | GC + liệt kê generations |
 | `d` / `dco` | `podman` / `podman-compose` |
 | `g` / `gs` / `ga` / `gc` / `gp` / `gl` / `gd` | Git shortcuts |
-| `dev` / `nrs` / `nrd` / `nrw` | `devenv` / `npm run …` |
+| `dev` / `devup` / `devdown` | `devenv` shortcuts |
 | `z` | `zoxide` (cd thông minh) |
 | `..` / `...` | `cd ..` / `cd ../..` |
+
+---
+
+## 🤖 AI & LLM
+
+| Công cụ | Vai trò | Mô hình |
+|---------|---------|---------|
+| **Aichat** | Chat CLI với DeepSeek + Gemini | `deepseek-chat`, `gemini-2.5-flash` |
+| **Ollama** | LLM local (CUDA accelerated) | `tinyllama`, `llama3.2:1b` |
+
+Ollama chạy nhẹ trên laptop: 1 model loaded, keep-alive 5 phút, GPU NVIDIA GTX 1650.
+
+```bash
+aichat                        # Chat với AI (CLI)
+ollama run tinyllama           # Chạy model local
+ollama list                    # Danh sách model đã tải
+```
 
 ---
 
@@ -47,22 +79,28 @@ fmt               # Format code Nix
 ```
 ~/.config/nixos/
 ├── flake.nix              # Entry point
-├── devenv.nix             # Dev environment + scripts
-├── Makefile               # Dashboard tương tác
+├── devenv.nix             # Dev environment + scripts + Dashboard
 ├── initial.sh             # Bootstrap + auto hardware detect
 ├── .envrc                 # Direnv (PATH_add)
+├── .gitignore
 ├── README.md
 ├── docs/                  # 📚 Tài liệu + templates
+│   ├── nixos-concepts.md  # Khái niệm NixOS
 │   ├── devenv-direnv.md   # Devenv workflow
 │   ├── podman-distrobox.md
-│   ├── nixos-concepts.md
 │   └── templates/         # devenv.nix + .envrc cho PHP/Go/Vue
 ├── hosts/lg/              # 🖥️  Per-machine
 │   ├── default.nix
 │   ├── hardware.nix       # Auto-generated
 │   └── Hardware.md        # Hardware report
 ├── modules/system/        # ⚙️  7 modules
-└── home/                  # 🏠  6 Home Manager modules
+└── home/                  # 🏠  7 Home Manager modules
+    ├── aichat.nix         # 🤖 Aichat config (DeepSeek + Gemini)
+    ├── packages.nix
+    ├── git.nix
+    ├── firefox.nix
+    ├── gnome.nix
+    └── zed.nix
 ```
 
 ---
@@ -79,11 +117,11 @@ fmt               # Format code Nix
 | PCIe ASPM | `default` | `powersupersave` |
 | WiFi / USB / Sound | Tắt | Powersave ON |
 
-- **NVIDIA**: PRIME offload — GPU tắt khi không dùng
+- **NVIDIA**: PRIME offload — GPU tắt khi không dùng (Ollama dùng CUDA khi cần)
 - **Bluetooth**: KHÔNG tự bật khi khởi động
 - **Boot**: systemd-boot + systemd initrd + Plymouth (logo LG)
 - **Ngủ**: **Hibernate** (không suspend) — fix bàn phím LG Gram
-- **Âm thanh**: Legacy HDA (SOF driver blacklisted)
+- **Âm thanh**: PipeWire + Legacy HDA (SOF driver blacklisted)
 
 ---
 
@@ -108,8 +146,9 @@ Templates có sẵn: [PHP/Laravel](docs/templates/devenv-php.nix) · [Golang](do
 |--------|-----------|
 | Bàn phím không hoạt động sau hibernate | Đã fix: `i8042` unbind/rebind |
 | Không có âm thanh | Đã fix: blacklist SOF → legacy HDA |
-| `nixd` lỗi trong Zed | `make home` để cài `nixd` |
+| `nixd` lỗi trong Zed | `home` để cài `nixd` |
 | Build thất bại | `sudo nixos-rebuild switch --rollback` |
+| Ollama không có GPU | Kiểm tra `nvidia-smi`, service ollama |
 
 ---
 
