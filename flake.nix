@@ -45,6 +45,24 @@
         };
       };
 
+
+      homeConfigurations = {
+        lg = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            {
+              home = {
+                username = "nqnhovn";
+                homeDirectory = "/home/nqnhovn";
+                stateVersion = "25.11";
+              };
+            }
+            ./home/default.nix
+          ];
+          extraSpecialArgs = { inherit inputs; };
+        };
+      };
+
       devShells.${system}.default = devenv.lib.mkShell {
         inherit inputs pkgs;
         modules = [
