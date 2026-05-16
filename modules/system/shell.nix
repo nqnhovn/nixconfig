@@ -91,6 +91,11 @@
 
       # ── Other Utility Aliases ─────────────────────────────────────────────
       v = "vim"; # Alias for vim
+      # ── AI / Aichat Agents ──────────────────────────────────────
+      a = "aichat -a";  # gọi nhanh agent: a general, a coding, a mes-erp
+      # ── AI / Aichat ──────────────────────────────────────────────────
+      # Auto-route thong minh: chon model theo noi dung cau hoi
+      ask = "f() { local q=\"$*\"; local m='gemini:gemini-2.5-flash'; local len=''${#q}; if [[ $len -gt 200 ]]; then m='deepseek:deepseek-reasoner'; elif [[ \"$q\" =~ (code|fix|error|bug|build|compile|nix|python|bash) ]]; then m='deepseek:deepseek-chat'; elif [[ \"$q\" =~ (system|config|may|laptop|generat|switch|boot) ]]; then aichat --agent general \"$q\"; return $?; fi; aichat -m \"$m\" -e \"$q\" || aichat -m 'gemini:gemini-2.5-flash' -e \"$q\"; }; f";
     };
   };
 
