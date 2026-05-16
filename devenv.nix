@@ -97,22 +97,17 @@
         echo -e "''${CYAN}╟──────────────────────────────────────────────────────────────╢''${NC}"
         echo -e "  ''${BOLD}📌 Profiles:''${NC}"
 
-        PROFILE_DIR="/nix/var/nix/profiles/per-user/root"
         PROFILE_COUNT=0
-        if [ -d "$PROFILE_DIR" ]; then
-          for pf in $(ls -1 "$PROFILE_DIR" 2>/dev/null); do
-            case "$pf" in
-              system|channels|channels-*|home-manager|home-manager-*) continue ;;
-              *)
-                PROFILE_COUNT=$((PROFILE_COUNT+1))
-                PF_GEN=$(readlink "$PROFILE_DIR/$pf" 2>/dev/null | grep -oP 'system-\K\d+' | head -1 || echo "?")
-                echo -e "    ''${YELLOW}⭐''${NC} ''${BOLD}$pf''${NC} ''${DIM}→ gen $PF_GEN''${NC}"
-                ;;
-            esac
-          done
-        fi
+        for entry in $(sudo sh -c 'ls /boot/loader/entries/nixos-*-generation-*.conf' 2>/dev/null); do
+          [ -f "$entry" ] || continue
+          PF_NAME=$(basename "$entry" | sed 's/nixos-//;s/-generation-[0-9]*.conf//')
+          [ -z "$PF_NAME" ] && continue
+          PF_GEN=$(grep -oP 'version: Generation \K\d+' "$entry" 2>/dev/null || echo "?")
+          PROFILE_COUNT=$((PROFILE_COUNT+1))
+          echo -e "    ''${YELLOW}⭐''${NC} ''${BOLD}$PF_NAME''${NC} ''${DIM}→ gen $PF_GEN''${NC}"
+        done
         if [ $PROFILE_COUNT -eq 0 ]; then
-          echo -e "    ''${DIM}(no pinned profiles)''${NC}"
+          echo -e "    ''${DIM}(none — pin with B→y after build)''${NC}"
         fi
 
         echo ""
