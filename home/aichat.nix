@@ -7,7 +7,6 @@
 
 {
   # Aichat configuration with DeepSeek + Google Gemini APIs
-  # DeepSeek & Gemini are built-in providers — only api_key needed.
   xdg.configFile."aichat/config.yaml" = {
     text = ''
       # Aichat Configuration - DeepSeek + Gemini
@@ -21,8 +20,10 @@
       keybindings: vi
       clients:
         - name: deepseek
+          type: openai_compatible
           api_key: sk-739376dce72f49ad832167488671b396
         - name: gemini
+          type: gemini
           api_key: AIzaSyBLoFoiKneKAJvQnVIfRyc9hYmTpiC-48o
     '';
   };

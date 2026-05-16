@@ -68,16 +68,20 @@
         echo -e "  ''${BOLD}''${WHITE}│ ID  │ Label                        │ Created             │''${NC}"
         echo -e "  ''${BOLD}''${WHITE}├─────┼──────────────────────────────┼─────────────────────┤''${NC}"
 
+        # Load labels from local file
+        declare -A LABELS
+        if [ -f ~/.config/nixos/.gen-labels ]; then
+          while read -r id rest; do
+            [ -n "$id" ] && LABELS[$id]="$rest"
+          done < ~/.config/nixos/.gen-labels
+        fi
         sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | tail -50 | while read -r line; do
           GEN_NUM=$(echo "$line" | awk '{print $1}')
           GEN_DATE=$(echo "$line" | awk '{print $2" "$3" "$4}' | sed 's/ /-/1' | sed 's/ /-/1')
-          GEN_LABEL=$(echo "$line" | awk '{for(i=5;i<=NF;i++) printf "%s ", $i; print ""}' | sed 's/ (current)//' | xargs)
+          GEN_LABEL="''${LABELS[$GEN_NUM]:-(no label)}"
           LEN=''${#GEN_LABEL}
           if [ "$LEN" -gt 28 ]; then
             GEN_LABEL="$(echo "$GEN_LABEL" | cut -c1-25)..."
-          fi
-          if [ -z "$GEN_LABEL" ]; then
-            GEN_LABEL="(no label)"
           fi
           PADDING=$((28 - ''${#GEN_LABEL}))
           PAD=$(printf "%''${PADDING}s" "")
@@ -98,7 +102,7 @@
         if [ -d "$PROFILE_DIR" ]; then
           for pf in $(ls -1 "$PROFILE_DIR" 2>/dev/null); do
             case "$pf" in
-              system|channels|home-manager) continue ;;
+              system|channels|channels-*|home-manager|home-manager-*) continue ;;
               *)
                 PROFILE_COUNT=$((PROFILE_COUNT+1))
                 PF_GEN=$(readlink "$PROFILE_DIR/$pf" 2>/dev/null | grep -oP 'system-\K\d+' | head -1 || echo "?")
@@ -135,8 +139,10 @@
             git commit -m "$LABEL" || echo -e "  ''${DIM}(nothing to commit)''${NC}"
             GIT_HASH=$(git rev-parse --short HEAD)
             echo -e "  ''${YELLOW}🔨 Building: ''${BOLD}$LABEL_SLUG-$GIT_HASH''${NC}"
-            sudo NIXOS_LABEL="$LABEL_SLUG-$GIT_HASH" nixos-rebuild switch --flake .#lg
-            echo -e "  ''${GREEN}✅ Build complete!''${NC}"
+            sudo nixos-rebuild switch --flake .#lg
+            NEW_GEN=$(sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | grep current | awk '{print $1}')
+            echo "$NEW_GEN $LABEL_SLUG-$GIT_HASH" >> ~/.config/nixos/.gen-labels
+            echo -e "  ''${GREEN}✅ Build complete! Gen #$NEW_GEN''${NC}"
 
             echo ""
             read -r -p "  📌 Pin as boot profile? (y/N): " PIN_CHOICE
@@ -164,6 +170,7 @@
               for g in $GENS; do
                 echo -e "  ''${YELLOW}Deleting generation $g...''${NC}"
                 sudo nix-env --delete-generations "$g" --profile /nix/var/nix/profiles/system
+                sed -i "/^$g /d" ~/.config/nixos/.gen-labels 2>/dev/null
               done
               echo -e "  ''${YELLOW}🧹 Running GC...''${NC}"
               sudo nix-collect-garbage -d
