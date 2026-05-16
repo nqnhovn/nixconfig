@@ -9,10 +9,8 @@
   # Aichat configuration with DeepSeek + Google Gemini APIs
   xdg.configFile."aichat/config.yaml" = {
     text = ''
-      # Aichat Configuration - DeepSeek + Gemini
       model: deepseek:deepseek-chat
       temperature: 0.7
-      top_p: 1.0
       save_session: true
       save: true
       highlight: true
@@ -21,15 +19,16 @@
       clients:
         - name: deepseek
           type: openai_compatible
+          api_base: https://api.deepseek.com/v1
           api_key: sk-739376dce72f49ad832167488671b396
+          models:
+            - name: deepseek-chat
+            - name: deepseek-reasoner
         - name: gemini
           type: gemini
           api_key: AIzaSyBLoFoiKneKAJvQnVIfRyc9hYmTpiC-48o
     '';
   };
 
-  # Add aichat to home packages
-  home.packages = with pkgs; [
-    aichat
-  ];
+  home.packages = with pkgs; [ aichat ];
 }
