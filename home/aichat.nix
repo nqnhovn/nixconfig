@@ -18,7 +18,7 @@
       keybindings: vi
       clients:
         - name: deepseek
-          type: openai_compatible
+          type: openai
           api_base: https://api.deepseek.com/v1
           api_key: sk-739376dce72f49ad832167488671b396
           models:
