@@ -98,13 +98,12 @@
         echo -e "  ''${BOLD}📌 Profiles:''${NC}"
 
         PROFILE_COUNT=0
-        for entry in $(sudo sh -c 'ls /boot/loader/entries/nixos-*-generation-*.conf' 2>/dev/null); do
-          [ -f "$entry" ] || continue
-          PF_NAME=$(basename "$entry" | sed 's/nixos-//;s/-generation-[0-9]*.conf//')
+        for entry in $(sudo sh -c 'ls -t /boot/loader/entries/nixos-*-generation-*.conf' 2>/dev/null); do
+          PF_NAME=$(echo "$entry" | sed 's|.*/nixos-||;s|-generation-[0-9]*.conf||')
           [ -z "$PF_NAME" ] && continue
-          PF_GEN=$(grep -oP 'version: Generation \K\d+' "$entry" 2>/dev/null || echo "?")
+          PF_DATE=$(sudo stat -c "%y" "$entry" 2>/dev/null | sed 's/-//g; s/ .*//; s/^..//')_$(sudo stat -c "%y" "$entry" 2>/dev/null | cut -d' ' -f2 | cut -d. -f1 | sed 's/://g')
           PROFILE_COUNT=$((PROFILE_COUNT+1))
-          echo -e "    ''${YELLOW}⭐''${NC} ''${BOLD}$PF_NAME''${NC} ''${DIM}→ gen $PF_GEN''${NC}"
+          echo -e "    ''${YELLOW}p$PROFILE_COUNT⭐''${NC} ''${BOLD}$PF_NAME''${NC} ''${DIM}$PF_DATE''${NC}"
         done
         if [ $PROFILE_COUNT -eq 0 ]; then
           echo -e "    ''${DIM}(none — pin with B→y after build)''${NC}"
@@ -160,16 +159,32 @@
 
           d|delete)
             echo ""
-            read -r -p "  🗑️  Gen ID(s) to delete (space-separated): " GENS
+            read -r -p "  🗑️  Gen ID or pN (profile): " GENS
             if [ -n "$GENS" ]; then
               for g in $GENS; do
-                echo -e "  ''${YELLOW}Deleting generation $g...''${NC}"
-                sudo nix-env --delete-generations "$g" --profile /nix/var/nix/profiles/system
-                sed -i "/^$g /d" ~/.config/nixos/.gen-labels 2>/dev/null
+                case "$g" in
+                  p*)
+                    N=''${g#p}
+                    PF_ENTRY=$(sudo sh -c 'ls -t /boot/loader/entries/nixos-*-generation-*.conf' 2>/dev/null | sed -n ''${N}p)
+                    if [ -n "$PF_ENTRY" ]; then
+                      PF_NAME=$(echo "$PF_ENTRY" | sed 's|.*/nixos-||;s|-generation-[0-9]*.conf||')
+                      echo -e "  ''${YELLOW}Deleting profile $PF_NAME...''${NC}"
+                      sudo rm "$PF_ENTRY"
+                      echo -e "  ''${GREEN}✅ Profile $PF_NAME deleted''${NC}"
+                    else
+                      echo -e "  ''${RED}Profile p$N not found''${NC}"
+                    fi
+                    ;;
+                  *)
+                    echo -e "  ''${YELLOW}Deleting gen $g...''${NC}"
+                    sudo nix-env --delete-generations "$g" --profile /nix/var/nix/profiles/system
+                    sed -i "/^$g /d" ~/.config/nixos/.gen-labels 2>/dev/null
+                    ;;
+                esac
               done
               echo -e "  ''${YELLOW}🧹 Running GC...''${NC}"
               sudo nix-collect-garbage -d
-              echo -e "  ''${GREEN}✅ Cleaned up!''${NC}"
+              echo -e "  ''${GREEN}✅ Done!''${NC}"
             fi
             echo ""
             read -r -p "  Press Enter to continue..." _
