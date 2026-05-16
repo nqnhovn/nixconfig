@@ -71,9 +71,9 @@
       # Dashboard: interactive TUI for generation management (Build, Delete, Switch, Home, Exit)
       nixos = "cd ~/.config/nixos && ./.devenv/profile/bin/dashboard";
       # Quick system rebuild with label (non-interactive)
-      build = "noglob f() { cd ~/.config/nixos && LABEL_SLUG=$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-') && GIT_HASH=$(git rev-parse --short HEAD) && git add . && git commit -m \"$1\" && sudo NIXOS_LABEL=\"$LABEL_SLUG-$GIT_HASH\" nixos-rebuild switch --flake .#lg && git push; }; f";
+      build = "noglob f() { cd ~/.config/nixos && LABEL_SLUG=$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-') && TS=$(date +%y%m%d_%H%M%S) && git add . && git commit -m \"$1\" && sudo nixos-rebuild switch --flake .#lg && git push; }; f";
       # Quick system update (auto-label with date)
-      sysupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d-%H%M)\"; fi; GIT_HASH=$(git rev-parse --short HEAD); sudo NIXOS_LABEL=\"sysupdate-$(date +%Y%m%d-%H%M)-$GIT_HASH\" nixos-rebuild switch --flake .#lg && git push; }; f";
+      sysupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d-%H%M)\"; fi; TS=$(date +%y%m%d_%H%M%S); sudo nixos-rebuild switch --flake .#lg && git push; }; f";
       # Quick home-manager update
       appupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"home: $(date +%Y-%m-%d-%H%M)\"; fi; home-manager switch --flake .#lg; }; f";
       # Quick GC

@@ -137,11 +137,11 @@
             echo -e "  ''${YELLOW}📦 Git add & commit...''${NC}"
             git add .
             git commit -m "$LABEL" || echo -e "  ''${DIM}(nothing to commit)''${NC}"
-            GIT_HASH=$(git rev-parse --short HEAD)
-            echo -e "  ''${YELLOW}🔨 Building: ''${BOLD}$LABEL_SLUG-$GIT_HASH''${NC}"
+            TS=$(date +%y%m%d_%H%M%S)
+            echo -e "  ''${YELLOW}🔨 Building: ''${BOLD}$LABEL_SLUG-$TS''${NC}"
             sudo nixos-rebuild switch --flake .#lg
             NEW_GEN=$(sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | grep current | awk '{print $1}')
-            echo "$NEW_GEN $LABEL_SLUG-$GIT_HASH" >> ~/.config/nixos/.gen-labels
+            echo "$NEW_GEN $LABEL_SLUG-$TS" >> ~/.config/nixos/.gen-labels
             echo -e "  ''${GREEN}✅ Build complete! Gen #$NEW_GEN''${NC}"
 
             echo ""
