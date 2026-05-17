@@ -8,11 +8,17 @@
 {
   # ── Hibernate + Keyboard fix ──────────────────────────────────────────
   services.logind.settings.Login = {
-    HandleLidSwitch = "suspend"; # Suspend when lid is closed
-    HandlePowerKey = "suspend";  # Suspend when power key is pressed
-    IdleAction = "suspend";    # Suspend when idle
-    IdleActionSec = "10min";   # Default idle time (for AC)
+    HandleLidSwitch = "suspend-then-hibernate";
+    HandleLidSwitchExternalPower = "suspend-then-hibernate";
+    HandlePowerKey = "suspend-then-hibernate";
+    IdleAction = "suspend-then-hibernate";
+    IdleActionSec = "10min";
   };
+
+  systemd.sleep.extraConfig = ''
+    HibernateDelaySec=5min
+  '';
+
 
   # ── Systemd user service to adjust IdleActionSec based on power source ──
   systemd.user.services.power-idle-adjust = {
