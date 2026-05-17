@@ -112,7 +112,7 @@
         echo ""
         echo -e "''${CYAN}╔══════════════════════════════════════════════════════════════╗''${NC}"
         echo -e "''${CYAN}║''${NC}  ''${BOLD}''${GREEN}B''${NC}/b: ''${WHITE}Build''${NC}   │  ''${BOLD}''${RED}D''${NC}/d: ''${WHITE}Delete''${NC}   │  ''${BOLD}''${BLUE}S''${NC}/s: ''${WHITE}Switch''${NC}   │  ''${BOLD}''${YELLOW}H''${NC}/h: ''${WHITE}Home''${NC}  ''${CYAN}║''${NC}"
-        echo -e "''${CYAN}║''${NC}  ''${BOLD}''${MAGENTA}C''${NC}/c: ''${WHITE}Clean''${NC}   │  ''${BOLD}''${YELLOW}R''${NC}/r: ''${WHITE}Reset''${NC}    │  ''${BOLD}''${RED}E''${NC}/e: ''${WHITE}Exit''${NC}                             ''${CYAN}║''${NC}"
+        echo -e "''${CYAN}║''${NC}  ''${BOLD}''${MAGENTA}C''${NC}/c: ''${WHITE}Clean''${NC}   │  ''${BOLD}''${YELLOW}R''${NC}/r: ''${WHITE}Reset''${NC}   │  ''${BOLD}''${BLUE}P''${NC}/p: ''${WHITE}Pin''${NC}     │  ''${BOLD}''${RED}E''${NC}/e: ''${WHITE}Exit''${NC}   ''${CYAN}║''${NC}"
         echo -e "''${CYAN}╚══════════════════════════════════════════════════════════════╝''${NC}"
         echo ""
         read -r -p "  ► " CHOICE
@@ -164,15 +164,15 @@
               for g in $GENS; do
                 case "$g" in
                   p*)
-                    N=''${g#p}
-                    PF_ENTRY=$(sudo sh -c 'ls -t /boot/loader/entries/nixos-*-generation-*.conf' 2>/dev/null | sed -n ''${N}p)
+                    PN=''${g#p}
+                    PF_ENTRY=$(sudo sh -c 'ls -t /boot/loader/entries/nixos-*-generation-*.conf' 2>/dev/null | sed -n ''${PN}p)
                     if [ -n "$PF_ENTRY" ]; then
                       PF_NAME=$(echo "$PF_ENTRY" | sed 's|.*/nixos-||;s|-generation-[0-9]*.conf||')
                       echo -e "  ''${YELLOW}Deleting profile $PF_NAME...''${NC}"
                       sudo rm "$PF_ENTRY"
                       echo -e "  ''${GREEN}✅ Profile $PF_NAME deleted''${NC}"
                     else
-                      echo -e "  ''${RED}Profile p$N not found''${NC}"
+                      echo -e "  ''${RED}Profile p$PN not found''${NC}"
                     fi
                     ;;
                   *)
@@ -254,6 +254,39 @@
             echo -e "  ''${DIM}💡 Old boot entries remain until overwritten by new builds''${NC}"
             echo ""
             read -r -p "  Press Enter to continue..." _
+            ;;
+
+          p|pin)
+            echo ""
+            read -r -p "  📌 Pin STT (1st column) as profile: " PS
+            if [ -n "$PS" ]; then
+              GEN_ID=$(sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | awk "NR==$PS" | awk '{print $1}')
+              # Fallback: if STT not found, try as gen ID directly
+              if [ -z "$GEN_ID" ]; then
+                if sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | grep -q "^\s*$PS\s"; then
+                  GEN_ID="$PS"
+                fi
+              fi
+              if [ -n "$GEN_ID" ]; then
+                CURRENT=$(sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | grep current | awk '{print $1}')
+                LBL=$(grep "^$GEN_ID " ~/.config/nixos/.gen-labels 2>/dev/null | cut -d' ' -f2-)
+                [ -z "$LBL" ] && LBL="gen$GEN_ID"
+                TS=$(date +%y%m%d_%H%M%S)
+                read -r -p "  📛 Name (default: $LBL): " PF_NAME
+                PF_NAME=''${PF_NAME:-$LBL}
+                echo -e "  ''${YELLOW}Switching to gen $GEN_ID to pin...''${NC}"
+                sudo nix-env --switch-generation "$GEN_ID" --profile /nix/var/nix/profiles/system
+                sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
+                sudo nixos-rebuild switch --flake .#lg --profile-name "$PF_NAME"
+                echo -e "  ''${YELLOW}Switching back to gen $CURRENT...''${NC}"
+                sudo nix-env --switch-generation "$CURRENT" --profile /nix/var/nix/profiles/system
+                sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
+                echo -e "  ''${GREEN}✅ Pinned gen $GEN_ID as: ''${BOLD}$PF_NAME''${NC}"
+              else
+                echo -e "  ''${RED}STT $PS not found''${NC}"
+              fi
+            fi
+            echo -e "  ''${DIM}Enter to continue...''${NC}"; read -r _
             ;;
 
           e|exit)
