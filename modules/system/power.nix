@@ -15,9 +15,9 @@
     IdleActionSec = "10min";
   };
 
-  systemd.sleep.extraConfig = ''
-    HibernateDelaySec=5min
-  '';
+  systemd.sleep.settings.Sleep = {
+    HibernateDelaySec = "5min";
+  };
 
 
   # ── Systemd user service to adjust IdleActionSec based on power source ──
