@@ -180,6 +180,101 @@ File Nix cấu hình: [`~/.config/nixos/home/aichat.nix`](../home/aichat.nix)
 
 ---
 
+## 🦀 Zed Multi-Agent System (v2.0 — Orchestrator)
+
+Hệ thống AI được mở rộng với **Orchestrator** — một Meta-Agent tự động nhận diện giai đoạn dự án và đảm nhận vai trò phù hợp trong 3 agent: PlanAgent, DevAgent, DocAgent.
+
+### Kiến trúc
+
+```
+┌──────────────────────────────────────────────────────┐
+│                 Zed Agent Panel                       │
+│                                                       │
+│   👤 Người dùng nói chuyện tự nhiên                    │
+│   🧠 Orchestrator (default rule) tự động phân tích     │
+│                                                       │
+│   ┌──────────┐   ┌──────────┐   ┌──────────┐         │
+│   │ PlanAgent │   │ DevAgent  │   │ DocAgent  │         │
+│   │ PO + SM   │──▶│ Code+Git  │──▶│ Tài liệu  │         │
+│   │ 5 phases  │   │ R→P→C→E   │   │ Markdown  │         │
+│   └──────────┘   └──────────┘   └──────────┘         │
+└──────────────────────────────────────────────────────┘
+```
+
+### Cách hoạt động
+
+**Orchestrator** (rule mặc định `plan-first.md`) tự động:
+1. Phân tích yêu cầu → nhận diện từ khóa dự án
+2. Xác định giai đoạn (0-5) + chọn vai trò (PlanAgent / DevAgent / DocAgent)
+3. Đảm nhận vai trò đó và thực hiện theo workflow Refine→Plan→Confirm→Execute
+
+### 3 Agent
+
+| Agent | Vai trò | Kích hoạt khi người dùng nói về... |
+|-------|---------|-----------------------------------|
+| **PlanAgent** | PO + SM | dự án mới, sprint, backlog, daily, review, retro, lập kế hoạch |
+| **DevAgent** | Developer | code, sửa lỗi, thêm tính năng, refactor, task |
+| **DocAgent** | Writer | tài liệu, document, readme, changelog, api doc, tổng hợp |
+
+### Cách dùng
+
+```bash
+# 1. Deploy Orchestrator làm default rule (chỉ cần làm 1 lần):
+#    - Mở Zed → Agent Panel → menu ... → Rules...
+#    - Chọn plan-first.md → nhấn 📎 (Set as default)
+
+# 2. Dùng hàng ngày — nói chuyện tự nhiên, KHÔNG cần @mention:
+"Bắt đầu dự án web bán hàng"             # → Orchestrator tự vào vai PlanAgent-PO
+"Bắt đầu Sprint 1"                       # → PlanAgent-PO+SM
+"Làm Task #1.1: Đăng ký người dùng"      # → DevAgent (code + git branch)
+"Daily Scrum hôm nay"                    # → PlanAgent-SM
+"Sprint Review"                          # → PlanAgent-PO+SM
+"Retrospective"                          # → PlanAgent-SM
+"Tổng hợp tài liệu Sprint 1"             # → DocAgent
+
+# 3. Vẫn có thể @-mention nếu muốn ép vai trò cụ thể:
+@DevAgent "sửa luôn không cần confirm"   # → Ép vào vai DevAgent
+```
+
+### Luồng làm việc điển hình (tự động)
+
+```
+👤 "Bắt đầu dự án X"
+  → 🧠 Orchestrator phát hiện: GĐ 0 - Khởi tạo → PlanAgent-PO
+  → Project Charter, Product Backlog, Risk Register
+
+👤 "Bắt đầu Sprint 1"
+  → 🧠 GĐ 1 - Sprint Planning → PlanAgent-PO+SM
+  → Sprint Goal, Sprint Backlog, Task Breakdown
+
+👤 "Làm Task #1.1"
+  → 🧠 GĐ 2 - The Sprint → DevAgent
+  → git branch → R→P→C→E → Code → Commit → Push
+
+👤 "Daily Scrum"
+  → 🧠 GĐ 3 - Daily → PlanAgent-SM
+
+👤 "Tổng hợp tài liệu"
+  → 🧠 GĐ 6 - Tài liệu → DocAgent
+```
+
+### Cài đặt
+
+```bash
+home-manager switch --flake .#lg
+```
+
+Source files: [`docs/zed-agents/`](zed-agents/)
+
+### Mẹo sử dụng
+
+- **Default Rule**: ĐÃ TỰ ĐỘNG — Orchestrator là rule mặc định, không cần làm gì thêm sau khi deploy
+- **Nói tự nhiên**: Không cần `@PlanAgent`, cứ nói "bắt đầu dự án", "làm task X", "tổng hợp tài liệu"
+- **@-mention khi cần ép**: Nếu muốn bỏ qua tự động nhận diện, gõ `@DevAgent` để ép vai trò
+- **Multi-thread**: Mở nhiều thread song song, Orchestrator hoạt động độc lập trên từng thread
+
+---
+
 ## 🐛 Sự cố thường gặp
 
 | Vấn đề | Giải pháp |
@@ -189,3 +284,5 @@ File Nix cấu hình: [`~/.config/nixos/home/aichat.nix`](../home/aichat.nix)
 | DeepSeek hết tiền | `ask` tự fallback về Gemini, hoặc `aichat -m gemini:gemini-2.5-flash` |
 | RAG không tìm thấy | `aichat --rebuild-rag <tên>` |
 | Agent không hoạt động | Kiểm tra `~/.config/aichat/agents/` có file `.md` không |
+| Zed Agent không thấy rule | Chạy `home-manager switch --flake .#lg`, sau đó mở Rules Library |
+| `@Agent` không hoạt động | Đảm bảo rule đã được deploy vào `~/.config/zed/rules/` |
