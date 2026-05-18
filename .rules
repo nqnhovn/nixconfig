@@ -57,3 +57,36 @@ Organize into numbered steps. Each step includes:
 ## Vietnamese
 
 Người dùng có thể giao tiếp bằng tiếng Việt. Khi người dùng viết bằng tiếng Việt, hãy trả lời bằng tiếng Việt và giữ nguyên quy trình REFINE → PLAN → CONFIRM → EXECUTE.
+
+---
+
+## Project Defaults
+
+Các thiết lập mặc định toàn cục cho dự án. Khi người dùng không chỉ định khác đi, mặc định áp dụng:
+
+| Thiết lập | Giá trị mặc định |
+|-----------|-----------------|
+| **Framework Agile** | Scrum |
+| **Quy mô dự án** | Phần mềm (Software) |
+| **Định dạng biểu mẫu** | Markdown (`.md`) — file tài liệu tự điền |
+| **Ngôn ngữ** | Tiếng Việt |
+| **Thư mục lập kế hoạch** | `plan/` |
+
+### Nguyên tắc biểu mẫu
+
+- **Liên kết chéo**: Mọi biểu mẫu trong `plan/` đều có phần "Tài liệu liên quan" ở cuối file, chứa đường dẫn tham chiếu đến các biểu mẫu liên quan khác.
+- **Tự điền**: Mỗi biểu mẫu chứa placeholder `[điền tại đây]` để người dùng điền thông tin trực tiếp.
+- **Cấu trúc nhất quán**: Mọi biểu mẫu gồm: Tiêu đề → Mục đích → Hướng dẫn điền → Nội dung chính → Tài liệu liên quan.
+
+### Quy trình khởi tạo dự án mới từ template
+
+Thư mục `plan/` tại gốc dự án là **template gốc (golden template)** — KHÔNG sửa đổi trực tiếp. Khi khởi tạo một dự án mới:
+
+1. **Copy** toàn bộ thư mục `plan/` từ template gốc sang thư mục dự án đích.
+2. **Giữ nguyên** cấu trúc thư mục và liên kết chéo giữa các file.
+3. **Điền** thông tin dự án cụ thể vào các placeholder `[điền tại đây]`.
+4. **Không** sửa nội dung template gốc — nếu cần cải tiến template, thực hiện trên bản gốc và cập nhật cho tất cả dự án.
+
+Quy tắc cho AI agent:
+- Khi người dùng yêu cầu "khởi tạo dự án", agent phải **copy** `plan/` từ template gốc sang đích, không tạo mới từ đầu.
+- Sau khi copy, agent có thể hỗ trợ điền thông tin nếu được yêu cầu.

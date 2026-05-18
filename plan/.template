@@ -1,0 +1,14 @@
+# Template Gốc (Golden Template)
+#
+# Thư mục này chứa bộ biểu mẫu Scrum chuẩn, dùng làm template
+# cho tất cả dự án phần mềm.
+#
+# QUAN TRỌNG:
+# - KHÔNG sửa đổi trực tiếp các file trong thư mục này.
+# - Khi khởi tạo dự án mới, COPY toàn bộ thư mục này sang dự án đích.
+# - Mọi placeholder [điền tại đây] sẽ được điền thông tin cụ thể tại bản copy.
+#
+# Framework: Scrum
+# Định dạng: Markdown (.md)
+# Quy mô: Phần mềm
+# Ngôn ngữ: Tiếng Việt
