@@ -14,5 +14,6 @@
     ./zed.nix
     ./gnome.nix
     ./aichat.nix
+    ./rules.nix
   ];
 }

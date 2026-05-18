@@ -101,12 +101,13 @@ aichat --list-models                    # Danh sách model khả dụng
 │   ├── hardware.nix       # Auto-generated
 │   └── Hardware.md        # Hardware report
 ├── modules/system/        # ⚙️  7 modules
-└── home/                  # 🏠  7 Home Manager modules
+└── home/                  # 🏠  8 Home Manager modules
     ├── aichat.nix         # 🤖 Aichat config (DeepSeek + Gemini)
     ├── packages.nix
     ├── git.nix
     ├── firefox.nix
     ├── gnome.nix
+    ├── rules.nix          # 📋 Zed Agent workflow rules (plan-first)
     └── zed.nix
 ```
 
@@ -144,6 +145,25 @@ devenv up      # Khởi động MySQL/Postgres
 ```
 
 Templates có sẵn: [PHP/Laravel](docs/templates/devenv-php.nix) · [Golang](docs/templates/devenv-go.nix) · [Vue 3](docs/templates/devenv-vue.nix)
+
+---
+
+## 🤖 Zed Agent — Workflow Plan-First
+
+Mọi dự án đều có workflow **Refine → Plan → Confirm → Execute** cho AI Agent Panel:
+
+```bash
+initrule     # Copy .rules vào thư mục hiện tại
+```
+
+Rule template được deploy tự động qua Home Manager tại:
+- `~/.config/zed/rules/plan-first.md` — Template dùng chung
+- `~/.rules` — File rút gọn, dùng `initrule` để copy
+
+Để áp dụng **toàn cục** (không cần initrule cho từng dự án):
+1. Mở Agent Panel (`Ctrl+Shift+A`) → menu `...` → **Rules...**
+2. Nhấn `+` tạo rule mới → paste nội dung từ `~/.rules`
+3. Nhấn biểu tượng 📎 (paper clip) để đặt làm **default rule**
 
 ---
 
