@@ -1,11 +1,41 @@
+# =====================================================================
+# HOME/ZED.NIX — ZED EDITOR CONFIG + NIXD LSP
+# =====================================================================
+
 { pkgs, ... }:
 
 {
-  # Removed xdg.configFile."zed/settings.json" to allow Zed to manage its own settings.json
-  # This enables Zed to save AI agent preferences and other settings directly.
+  # Settings do Zed tự quản lý — không ghi đè để Zed lưu được AI preferences
+  # Các file rules được deploy qua home/rules.nix → ~/.config/zed/rules/
 
-  # You can still install nixd for Zed as a system package
   home.packages = with pkgs; [
-    nixd
+    nixd              # Nix Language Server
   ];
+
+  # Cấu hình cơ bản qua XDG (không xung đột với Zed tự quản lý)
+  xdg.configFile."zed/settings.json".text = builtins.toJSON {
+    # LSP
+    lsp = {
+      nixd.settings = {
+        formatting.command = [ "nixpkgs-fmt" ];
+      };
+    };
+
+    # Editor preferences
+    buffer_font_size = 14;
+    tab_size = 2;
+    soft_wrap = "editor_width";
+    format_on_save = "on";
+
+    # File exclusions
+    file_scan_exclusions = [
+      "**/.git"
+      "**/.devenv"
+      "**/result"
+      "**/result-*"
+    ];
+
+    # Theme
+    theme = "One Dark";
+  };
 }

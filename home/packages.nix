@@ -15,6 +15,13 @@
     mdcat             # cat for markdown (cho AI Panel doc)
     fd                # find nhanh hơn
     nixd              # Nix Language Server cho Zed
+    # Dev tools (AI Agent workflow)
+    lazygit           # Git TUI
+    git-delta         # Beautiful git diff
+    xh                # HTTP client (Rust)
+    yq-go             # YAML processor
+    tig               # Git text-mode browser
+    marksman          # Markdown LSP (cho Zed)
     # appflowy
     # reno
     # gnote

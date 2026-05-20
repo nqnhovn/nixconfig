@@ -60,7 +60,7 @@ in
     '';
   };
 
-  # ── Agent: general (tổng hợp) ───────────────────────────────────
+  # ── Agent: general ──────────────────────────────────────────────
   xdg.configFile."aichat/agents/general.md".text = ''
     ---
     model: gemini:gemini-2.5-flash
@@ -71,7 +71,7 @@ in
     Trả lời ngắn gọn, tập trung giải pháp. Dùng tiếng Việt khi được hỏi tiếng Việt.
   '';
 
-  # ── Agent: coding (lập trình) ───────────────────────────────────
+  # ── Agent: coding ───────────────────────────────────────────────
   xdg.configFile."aichat/agents/coding.md".text = ''
     ---
     model: deepseek:deepseek-chat
@@ -83,7 +83,7 @@ in
     Nếu cần tạo dự án mới → gợi ý template từ RAG.
   '';
 
-  # ── Agent: mes-erp (quản lý sản xuất) ───────────────────────────
+  # ── Agent: mes-erp ──────────────────────────────────────────────
   xdg.configFile."aichat/agents/mes-erp.md".text = ''
     ---
     model: deepseek:deepseek-chat
@@ -94,6 +94,70 @@ in
     Am hiểu: MES (real-time tracking, OEE, QC, traceability), ERP (tài chính, kho, mua hàng, nhân sự).
     Công nghệ: PostgreSQL, Go/Python/C#, React/Vue, RabbitMQ/Kafka, OPC-UA/MQTT.
     Tư vấn kiến trúc, tích hợp, và best practices cho hệ thống sản xuất.
+  '';
+
+  # ── RAG Content: general/about.md ───────────────────────────────
+  xdg.configFile."aichat/rags/general/about.md".text = ''
+    # Thông tin hệ thống — NixOS LG Gram 17
+
+    ## Phần cứng
+    - **Máy**: LG Gram 17 (17U70N)
+    - **CPU**: Intel i5-10210U (Comet Lake, 4C/8T)
+    - **GPU**: Intel UHD Graphics + NVIDIA GTX 1650 (PRIME offload)
+    - **RAM**: 16GB DDR4
+    - **SSD**: NVMe
+
+    ## Phần mềm
+    - **OS**: NixOS 26.05 (Yarara)
+    - **DE**: GNOME 49 + Wayland
+    - **Editor**: Zed
+    - **Shell**: Zsh + Starship
+    - **Container**: Podman + Distrobox
+    - **Dev env**: Devenv + Direnv
+
+    ## Cấu trúc NixOS config
+    ```
+    ~/.config/nixos/
+    ├── flake.nix
+    ├── hosts/lg/
+    ├── modules/system/ (7 modules)
+    ├── home/ (8 modules)
+    ├── plan/ (Scrum templates)
+    ├── docs/
+    ├── secrets/ (gitignored)
+    └── scripts/
+    ```
+
+    ## AI Agent System
+    - **Orchestrator**: Tự động chọn Agent dựa trên giai đoạn dự án
+    - **5 Agent**: PlanAgent, DevAgent, DocAgent, TechAgent, CicdAgent
+    - **Aichat**: DeepSeek + Gemini, 3 RAG sets
+  '';
+
+  # ── RAG Content: coding/patterns.md ─────────────────────────────
+  xdg.configFile."aichat/rags/coding/patterns.md".text = ''
+    # Coding Patterns & Best Practices
+
+    ## Nix
+    - Dùng `builtins.readFile` thay vì inline string dài
+    - Module hóa: mỗi file < 100 dòng, mỗi module 1 trách nhiệm
+    - Format bằng `nixpkgs-fmt`
+
+    ## Git Workflow
+    - Branch: `feature/`, `fix/`, `refactor/`, `docs/`, `chore/`
+    - Commit: `<type>(<scope>): <subject>`
+    - Pre-commit hooks: format + lint + secrets check
+
+    ## Clean Code (Solo Coder)
+    - Hàm < 30 dòng, File < 300 dòng
+    - Đặt tên rõ ràng, không viết tắt
+    - Comment "tại sao", không phải "cái gì"
+    - Viết test trước khi refactor
+
+    ## Shell Scripts
+    - Luôn `set -euo pipefail`
+    - Dùng `shellcheck`
+    - Ưu tiên `[[` thay vì `[`
   '';
 
   home.packages = with pkgs; [ aichat ];

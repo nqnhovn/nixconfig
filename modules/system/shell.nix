@@ -110,6 +110,8 @@
       a = "aichat -a";  # gọi nhanh agent: a general, a coding, a mes-erp
       # ── Zed Agent Rules ────────────────────────────────────────────
       initrule = "cp ~/.rules ./.rules && echo '✅ .rules copied to current directory'";
+      # ── Project Init ────────────────────────────────────────────────
+      initproject = "bash ~/.config/nixos/scripts/initproject.sh";
     };
   };
 
