@@ -1,13 +1,13 @@
 # =====================================================================
 # HOME/AICHAT.NIX — AICHAT CONFIG (DEEPSEEK + GEMINI + RAG ×3)
 # 🔗 https://github.com/sigoden/aichat
-# API keys được import từ secrets/aichat-keys.nix (đã gitignore)
+# API keys: import từ ~/.secrets/aichat-keys.nix (ngoài flake, an toàn)
 # =====================================================================
 
 { pkgs, ... }:
 
 let
-  keys = import ../secrets/aichat-keys.nix;
+  keys = import /home/nqnhovn/.secrets/aichat-keys.nix;
 in
 {
   xdg.configFile."aichat/config.yaml" = {
@@ -115,19 +115,6 @@ in
     - **Container**: Podman + Distrobox
     - **Dev env**: Devenv + Direnv
 
-    ## Cấu trúc NixOS config
-    ```
-    ~/.config/nixos/
-    ├── flake.nix
-    ├── hosts/lg/
-    ├── modules/system/ (7 modules)
-    ├── home/ (8 modules)
-    ├── plan/ (Scrum templates)
-    ├── docs/
-    ├── secrets/ (gitignored)
-    └── scripts/
-    ```
-
     ## AI Agent System
     - **Orchestrator**: Tự động chọn Agent dựa trên giai đoạn dự án
     - **5 Agent**: PlanAgent, DevAgent, DocAgent, TechAgent, CicdAgent
@@ -152,7 +139,6 @@ in
     - Hàm < 30 dòng, File < 300 dòng
     - Đặt tên rõ ràng, không viết tắt
     - Comment "tại sao", không phải "cái gì"
-    - Viết test trước khi refactor
 
     ## Shell Scripts
     - Luôn `set -euo pipefail`
