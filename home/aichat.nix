@@ -1,13 +1,12 @@
 # =====================================================================
 # HOME/AICHAT.NIX — AICHAT CONFIG (DEEPSEEK + GEMINI + RAG ×3)
 # 🔗 https://github.com/sigoden/aichat
-# API keys: import từ ~/.secrets/aichat-keys.nix (ngoài flake, an toàn)
 # =====================================================================
 
 { pkgs, ... }:
 
 let
-  keys = import /home/nqnhovn/.secrets/aichat-keys.nix;
+  keys = import ../secrets/aichat-keys.nix;
 in
 {
   xdg.configFile."aichat/config.yaml" = {
