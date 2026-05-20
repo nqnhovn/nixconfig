@@ -1,10 +1,14 @@
 # =====================================================================
 # HOME/AICHAT.NIX — AICHAT CONFIG (DEEPSEEK + GEMINI + RAG ×3)
 # 🔗 https://github.com/sigoden/aichat
+# API keys được import từ secrets/aichat-keys.nix (đã gitignore)
 # =====================================================================
 
 { pkgs, ... }:
 
+let
+  keys = import ../secrets/aichat-keys.nix;
+in
 {
   xdg.configFile."aichat/config.yaml" = {
     text = ''
@@ -27,13 +31,13 @@
         - name: deepseek
           type: openai
           api_base: https://api.deepseek.com/v1
-          api_key: sk-739376dce72f49ad832167488671b396
+          api_key: ${keys.deepseek.key}
           models:
             - name: deepseek-chat
             - name: deepseek-reasoner
         - name: gemini
           type: gemini
-          api_key: AIzaSyBLoFoiKneKAJvQnVIfRyc9hYmTpiC-48o
+          api_key: ${keys.gemini.key}
 
       # ── RAG: 3 bộ tri thức ──────────────────────────────────────
       rags:

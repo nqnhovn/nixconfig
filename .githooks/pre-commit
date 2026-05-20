@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# =====================================================================
+# .GITHOOKS/PRE-COMMIT — AUTO FORMAT + VALIDATE CHO NIXOS CONFIG
+# =====================================================================
+set -euo pipefail
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
+echo -e "${YELLOW}🔍 Pre-commit: checking...${NC}"
+
+# ── 1. Check for secrets leakage ─────────────────────────────────
+if git diff --cached --name-only | grep -q "secrets/aichat-keys.nix"; then
+  echo -e "  ${RED}❌ BLOCKED: secrets/aichat-keys.nix is being committed!${NC}"
+  exit 1
+fi
+
+# ── 2. Check for leftover merge conflicts ────────────────────────
+if git diff --cached --name-only | xargs grep -l '<<<<<<<\|=======\|>>>>>>>' 2>/dev/null; then
+  echo -e "  ${RED}❌ BLOCKED: Merge conflict markers found!${NC}"
+  exit 1
+fi
+
+# ── 3. Format Nix files ──────────────────────────────────────────
+if command -v nixpkgs-fmt &>/dev/null; then
+  for f in $(git diff --cached --name-only --diff-filter=ACM | grep '\.nix$' || true); do
+    [ ! -f "$f" ] && continue
+    nixpkgs-fmt --check "$f" 2>/dev/null || echo -e "  ${YELLOW}⚠️  $f needs formatting${NC}"
+  done
+fi
+
+# ── 4. ShellCheck for scripts ──────────────────────────────────
+if command -v shellcheck &>/dev/null; then
+  for f in $(git diff --cached --name-only --diff-filter=ACM | grep '\.sh$' || true); do
+    [ ! -f "$f" ] && continue
+    shellcheck -x "$f" 2>/dev/null || echo -e "  ${YELLOW}⚠️  $f has shell issues${NC}"
+  done
+fi
+
+echo -e "${GREEN}✅ Pre-commit passed!${NC}"

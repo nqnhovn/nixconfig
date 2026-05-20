@@ -1,3 +1,7 @@
+# =====================================================================
+# HOME/GIT.NIX — GIT CONFIG + USER + HOOKS
+# =====================================================================
+
 { ... }:
 
 {
@@ -9,6 +13,7 @@
         email = "nqnho.vn@gmail.com";
       };
       init.defaultBranch = "main";
+      core.hooksPath = "~/.config/nixos/.githooks";
     };
   };
 }

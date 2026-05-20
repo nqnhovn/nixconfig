@@ -11,3 +11,9 @@ __pycache__
 *~
 .env
 .env.local
+
+# Secrets (API keys, tokens)
+secrets/aichat-keys.nix
+
+# RAG cache
+*.rag-cache/

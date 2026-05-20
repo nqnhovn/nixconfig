@@ -170,7 +170,9 @@
                       PF_NAME=$(echo "$PF_ENTRY" | sed 's|.*/nixos-||;s|-generation-[0-9]*.conf||')
                       echo -e "  ''${YELLOW}Deleting profile $PF_NAME...''${NC}"
                       sudo rm "$PF_ENTRY"
-                      echo -e "  ''${GREEN}✅ Profile $PF_NAME deleted''${NC}"
+                      # Also remove symlink to prevent recreation on next build
+                      sudo rm -f "/nix/var/nix/profiles/system-profiles/$PF_NAME" 2>/dev/null || true
+                      echo -e "  ''${GREEN}✅ Profile $PF_NAME deleted (entry + symlink)''${NC}"
                     else
                       echo -e "  ''${RED}Profile p$PN not found''${NC}"
                     fi
