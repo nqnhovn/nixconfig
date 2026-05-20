@@ -14,7 +14,8 @@ if git diff --cached --name-only | grep -q "secrets/aichat-keys.nix"; then
 fi
 
 # ── 2. Check for leftover merge conflicts ────────────────────────
-if git diff --cached --name-only | xargs grep -l '<<<<<<<\|=======\|>>>>>>>' 2>/dev/null; then
+# Only match TRUE conflict markers (^<<<<<<< , ^=======$, ^>>>>>>> )
+if git diff --cached --name-only | xargs grep -El '^(<<<<<<< |=======$|>>>>>>> )' 2>/dev/null; then
   echo -e "  ${RED}❌ BLOCKED: Merge conflict markers found!${NC}"
   exit 1
 fi
