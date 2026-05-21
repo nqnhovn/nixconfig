@@ -13,15 +13,13 @@ in
     enable = lib.mkEnableOption "Headless mode (no GPU, no GUI)";
   };
 
+  # Default: headless không cần enable gì thêm (tắt hết)
   config = lib.mkIf cfg.enable {
+    flake.graphics.headless.enable = true;
+  } // {
     services.xserver.enable = lib.mkForce false;
     services.displayManager.gdm.enable = lib.mkForce false;
     services.desktopManager.gnome.enable = lib.mkForce false;
     hardware.graphics.enable = lib.mkForce false;
-  };
-
-  # Default: headless không cần enable gì thêm (tắt hết)
-  config = {
-    flake.graphics.headless.enable = true;
   };
 }
