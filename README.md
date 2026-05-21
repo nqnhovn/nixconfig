@@ -69,6 +69,10 @@ nho                 # Switch hệ thống (nh os switch)
 nhh                 # Switch Home Manager (nh home switch)
 nht                 # Test build (nh os test)
 nhb                 # Build boot (nh os boot)
+
+# ── ISO Build ────────────────────────────────────────────
+iso-standard        # 🖥️  Build vnixos-standard.iso → ~/isofiles/
+iso-minidev         # 🛠️  Build vnixos-minidev.iso → ~/isofiles/
 ```
 
 ## 🖥️ Dashboard (nixos / dashboard)
@@ -99,14 +103,18 @@ Dashboard TUI quản lý generations:
 ## 📀 ISO Builds
 
 ```bash
-nix build .#iso-standard    # 🖥️  Desktop + WPS Office + GNOME + Calamares
-nix build .#iso-minidev     # 🛠️  Developer (Go, Node, Python, Podman, Zed)
+iso-standard                # 🖥️  Build vnixos-standard.iso → ~/isofiles/
+iso-minidev                 # 🛠️  Build vnixos-minidev.iso → ~/isofiles/
+
+# Hoặc dùng nix build trực tiếp:
 nix build .#vm-qcow2        # 🖴 QEMU image
 nix build .#vm-vbox         # 📦 VirtualBox OVA
 nix build .#wsl             # 🪟 WSL image
 nix build .#amazon          # ☁️  EC2 image
 nix build .#docker          # 🐳 Docker container
 ```
+
+> 📁 Output ISO: `~/isofiles/vnixos-standard.iso` và `~/isofiles/vnixos-minidev.iso`
 
 ### 🚀 Post-install Setup Wizard
 

@@ -309,6 +309,38 @@
       done
     '';
 
+    # ── ISO Build ──────────────────────────────────────────────────────
+    # Build ISO image và copy vào ~/isofiles/ với tên vnixos-*.iso
+    iso-standard.exec = ''
+      mkdir -p ~/isofiles
+      echo "🔨 Building vnixos-standard.iso..."
+      nix build .#iso-standard --out-link ~/isofiles/vnixos-standard 2>&1 | tail -5
+      ISO_FILE=$(find ~/isofiles/vnixos-standard -name "*.iso" -type f | head -1)
+      if [ -n "$ISO_FILE" ] && [ ! -f ~/isofiles/vnixos-standard.iso ]; then
+        cp "$ISO_FILE" ~/isofiles/vnixos-standard.iso
+        echo "✅  ~/isofiles/vnixos-standard.iso  ($(du -h ~/isofiles/vnixos-standard.iso | cut -f1))"
+      elif [ -f ~/isofiles/vnixos-standard.iso ]; then
+        echo "✅  ~/isofiles/vnixos-standard.iso  (đã tồn tại, cập nhật symlink)"
+      fi
+      rm -f ~/isofiles/vnixos-standard 2>/dev/null || true
+      ls -lh ~/isofiles/vnixos-standard.iso 2>/dev/null || true
+    '';
+
+    iso-minidev.exec = ''
+      mkdir -p ~/isofiles
+      echo "🔨 Building vnixos-minidev.iso..."
+      nix build .#iso-minidev --out-link ~/isofiles/vnixos-minidev 2>&1 | tail -5
+      ISO_FILE=$(find ~/isofiles/vnixos-minidev -name "*.iso" -type f | head -1)
+      if [ -n "$ISO_FILE" ] && [ ! -f ~/isofiles/vnixos-minidev.iso ]; then
+        cp "$ISO_FILE" ~/isofiles/vnixos-minidev.iso
+        echo "✅  ~/isofiles/vnixos-minidev.iso  ($(du -h ~/isofiles/vnixos-minidev.iso | cut -f1))"
+      elif [ -f ~/isofiles/vnixos-minidev.iso ]; then
+        echo "✅  ~/isofiles/vnixos-minidev.iso  (đã tồn tại, cập nhật symlink)"
+      fi
+      rm -f ~/isofiles/vnixos-minidev 2>/dev/null || true
+      ls -lh ~/isofiles/vnixos-minidev.iso 2>/dev/null || true
+    '';
+
     # ── Devenv shortcuts ──────────────────────────────────────────────
     dev.exec = "devenv";
     devup.exec = "devenv up";

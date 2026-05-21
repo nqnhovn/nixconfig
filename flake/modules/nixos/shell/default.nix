@@ -77,6 +77,9 @@
       nht = "nh os test";      # Test build
       nhb = "nh os boot";      # Build boot
       nixos-setup = "bash ~/.config/nixos/scripts/nixos-setup.sh";  # Post-install wizard
+      # ── ISO Build ─────────────────────────────────────────────
+      iso-standard = "cd ~/.config/nixos && iso-standard";      # Build vnixos-standard.iso
+      iso-minidev = "cd ~/.config/nixos && iso-minidev";        # Build vnixos-minidev.iso
       # ── Legacy scripts ────────────────────────────────────────
       build = "noglob f() { cd ~/.config/nixos && LABEL_SLUG=$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-') && TS=$(date +%y%m%d_%H%M%S) && git add . && git commit -m \"$1\" && sudo nixos-rebuild switch --flake .#$(hostname) && git push; }; f";
       sysupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d-%H%M)\"; fi; TS=$(date +%y%m%d_%H%M%S); sudo nixos-rebuild switch --flake .#$(hostname) && git push; }; f";
