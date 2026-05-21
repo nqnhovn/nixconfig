@@ -1,4 +1,4 @@
-# ❄️ NixOS Configuration — LG Gram 17 (17U70N)
+# ❄️ NixOS Configuration — Snowfall Lib · Multi-Host
 
 **NixOS 26.05 · GNOME 49 + Wayland · Intel i5-10210U + NVIDIA GTX 1650**
 
@@ -12,14 +12,68 @@ sudo bash ~/.config/nixos/initial.sh   # Bootstrap: detect hardware + tạo host
 nixos                                     # Mở Dashboard quản lý generations
 ```
 
-`initial.sh` tự động quét phần cứng (`lspci -nn`, `lsblk`, `findmnt`) → tạo `hardware.nix` + `Hardware.md`.
+---
+
+## 🗂️ Cấu trúc dự án (Snowfall Lib)
+
+```
+~/.config/nixos/
+├── flake.nix                    # Entry point (redirect → flake/flake.nix)
+├── flake.lock
+├── .gitignore
+├── README.md
+│
+├── flake/                       # ❄️ Snowfall Lib core
+│   ├── flake.nix                # Main flake: mkHost, mkISO builders
+│   ├── lib/default.nix          # Helper library
+│   ├── modules/nixos/           # ⚙️ 8 domain modules
+│   │   ├── core/                # User, Nix settings, system packages
+│   │   ├── boot/                # Bootloader, kernel, initrd, Plymouth
+│   │   ├── graphics/            # 🎨 4 profiles + GNOME desktop
+│   │   │   ├── profiles/        # intel-only, nvidia-prime, vm-guest, headless
+│   │   │   └── desktop/gnome.nix
+│   │   ├── power/               # 🔋 TLP, thermald, hibernate
+│   │   ├── network/             # NetworkManager, timezone
+│   │   ├── services/            # Bluetooth, PipeWire, Podman, fcitx5
+│   │   ├── shell/               # Zsh, Starship, direnv, zoxide + nh aliases
+│   │   ├── i18n/                # 🌐 Locale deferral system
+│   │   └── installer/           # 📀 ISO profiles (standard/minimal)
+│   ├── homes/x86_64-linux/      # 🏠 8 Home Manager modules
+│   ├── systems/x86_64-linux/    # 🖥️ 3 hosts
+│   │   ├── lg/                  # LG Gram 17 (nvidia-prime)
+│   │   ├── vm/                  # VM dev (vm-guest)
+│   │   └── vps/                 # VPS (headless)
+│   ├── overlays/
+│   └── packages/
+│
+├── secrets/                     # 🔐 Key management
+│   ├── keys.example.nix         # Template (tracked)
+│   └── keys.nix                 # Key thật (gitignored)
+│
+├── docs/                        # 📚 Tài liệu
+├── scripts/                     # Tiện ích
+├── plan/                        # 📋 Scrum templates
+├── devenv.nix                   # Dev environment
+└── initial.sh                   # Bootstrap
+```
 
 ---
 
 ## 🎮 Hàng ngày
 
 ```bash
-nixos               # 🖥️  Dashboard tương tác (Build, Delete, Switch, Home, Exit)
+nixos               # 🖥️  Dashboard tương tác
+
+# ── nh (nix-helper) shortcuts ─────────────────────────────────
+nhs                 # Tìm package (nh search)
+nhl                 # Liệt kê generations (nh list)
+nhc                 # Dọn tất cả (nh clean all)
+nho                 # Switch hệ thống (nh os switch)
+nhh                 # Switch Home Manager (nh home switch)
+nht                 # Test build (nh os test)
+nhb                 # Build boot (nh os boot)
+
+# ── Legacy ────────────────────────────────────────────────────
 switch            # devenv script: nixos-rebuild switch
 boot              # devenv script: build (không switch)
 home              # devenv script: rebuild user config
@@ -35,101 +89,79 @@ Dashboard TUI chuyên nghiệp quản lý generations:
 - **D/d: Delete** — Nhập ID gen → xóa + GC
 - **S/s: Switch** — Rollback về gen bất kỳ + git checkout commit tương ứng
 - **H/h: Home** — Rebuild Home Manager
-- **C/c: Clean** — Xóa tất cả gen, chỉ giữ N gen gần nhất (mặc định: 3)
+- **C/c: Clean** — Xóa tất cả gen, chỉ giữ N gen gần nhất
 - **R/r: Reset** — Tạo profile mới, reset gen counter về 1
 - **E/e: Exit** — Thoát
 
 ---
 
-## ⌨️ Zsh Aliases
+## 🎨 Graphics Profiles
 
-| Alias | Chức năng |
-|-------|-----------|
-| `nixos` | Mở Dashboard quản lý generations |
-| `build "msg"` | Quick rebuild với label (non-interactive) |
-| `sysupdate` | Auto-commit nếu dirty → rebuild → push |
-| `appupdate` | Auto-commit nếu dirty → rebuild user config |
-| `gen` | Liệt kê generations |
-| `clean` | GC + liệt kê generations |
-| `d` / `dco` | `podman` / `podman-compose` |
-| `g` / `gs` / `ga` / `gc` / `gp` / `gl` / `gd` | Git shortcuts |
-| `dev` / `devup` / `devdown` | `devenv` shortcuts |
-| `z` | `zoxide` (cd thông minh) |
-| `..` / `...` | `cd ..` / `cd ../..` |
+| Profile        | GPU                              | Dùng cho                   |
+| -------------- | -------------------------------- | -------------------------- |
+| `nvidia-prime` | Intel UHD + NVIDIA PRIME offload | LG Gram, laptop hybrid     |
+| `intel-only`   | Intel UHD (tiết kiệm pin)        | Laptop trên pin, ultrabook |
+| `vm-guest`     | virtio-gpu                       | QEMU/VirtualBox guest      |
+| `headless`     | Không GPU                        | VPS, server                |
 
 ---
 
-## 🤖 AI & LLM
-
-### Aichat — [github.com/sigoden/aichat](https://github.com/sigoden/aichat)
-
-Chat CLI đa năng, hỗ trợ 20+ provider. Cấu hình trong [`home/aichat.nix`](home/aichat.nix):
-
-| Provider | Model | Dùng cho |
-|----------|-------|----------|
-| **DeepSeek** | `deepseek-chat` | Chat hàng ngày, code review |
-| **DeepSeek** | `deepseek-reasoner` | Suy luận phức tạp |
-| **Google Gemini** | `gemini-2.5-flash` | Nhanh, context 1M token |
-| **Google Gemini** | `gemini-2.5-pro` | Mạnh nhất của Google |
+## 📀 ISO Builds
 
 ```bash
-aichat                                 # Chat CLI - mặc định DeepSeek
-aichat -m gemini:gemini-2.5-flash        # Dùng Gemini
-aichat -f code.py                       # Chat về file code
-aichat --list-models                    # Danh sách model khả dụng
-```
-
----
-
-## 🗂️ Cấu trúc dự án
-
-```
-~/.config/nixos/
-├── flake.nix              # Entry point
-├── devenv.nix             # Dev environment + scripts + Dashboard
-├── initial.sh             # Bootstrap + auto hardware detect
-├── .envrc                 # Direnv (PATH_add)
-├── .gitignore
-├── README.md
-├── docs/                  # 📚 Tài liệu + templates
-│   ├── nixos-concepts.md  # Khái niệm NixOS
-│   ├── devenv-direnv.md   # Devenv workflow
-│   ├── podman-distrobox.md
-│   └── templates/         # devenv.nix + .envrc cho PHP/Go/Vue
-├── hosts/lg/              # 🖥️  Per-machine
-│   ├── default.nix
-│   ├── hardware.nix       # Auto-generated
-│   └── Hardware.md        # Hardware report
-├── modules/system/        # ⚙️  7 modules
-└── home/                  # 🏠  8 Home Manager modules
-    ├── aichat.nix         # 🤖 Aichat config (DeepSeek + Gemini)
-    ├── packages.nix
-    ├── git.nix
-    ├── firefox.nix
-    ├── gnome.nix
-    ├── rules.nix          # 📋 Zed Agent workflow rules (plan-first)
-    └── zed.nix
+nix build .#iso-standard    # 🖥️  GNOME + Calamares + nh + App Store
+nix build .#iso-minimal     # ⚡ Server/headless
+nix build .#vm-qcow2        # 🖴 QEMU image
+nix build .#vm-vbox         # 📦 VirtualBox OVA
+nix build .#wsl             # 🪟 WSL image
+nix build .#amazon          # ☁️  EC2 image
+nix build .#docker          # 🐳 Docker container
 ```
 
 ---
 
 ## 🔋 Pin & Hiệu năng
 
-| Hạng mục | Trên sạc | Trên pin |
-|----------|----------|----------|
-| CPU Governor | `performance` | `powersave` |
-| CPU Boost | Bật | **Tắt** |
-| CPU Max | 100% | **60%** |
-| Intel GPU | Mặc định | **300-650MHz** |
-| NVMe | Mặc định | **lowest power** |
-| PCIe ASPM | `default` | `powersupersave` |
-| WiFi / USB / Sound | Tắt | Powersave ON |
+| Hạng mục           | Trên sạc      | Trên pin         |
+| ------------------ | ------------- | ---------------- |
+| CPU Governor       | `performance` | `powersave`      |
+| CPU Boost          | Bật           | **Tắt**          |
+| CPU Max            | 100%          | **60%**          |
+| Intel GPU          | Mặc định      | **300-650MHz**   |
+| NVMe               | Mặc định      | **lowest power** |
+| PCIe ASPM          | `default`     | `powersupersave` |
+| WiFi / USB / Sound | Tắt           | Powersave ON     |
 
 - **NVIDIA**: PRIME offload — GPU tắt khi không dùng
 - **Bluetooth**: KHÔNG tự bật khi khởi động
 - **Boot**: systemd-boot + systemd initrd + Plymouth (logo LG)
 - **Ngủ**: **Hibernate** (không suspend) — fix bàn phím LG Gram
 - **Âm thanh**: PipeWire + Legacy HDA (SOF driver blacklisted)
+
+---
+
+## 🤖 AI & LLM
+
+### Aichat
+
+Chat CLI đa năng, hỗ trợ 20+ provider:
+
+| Provider          | Model               | Dùng cho                    |
+| ----------------- | ------------------- | --------------------------- |
+| **DeepSeek**      | `deepseek-chat`     | Chat hàng ngày, code review |
+| **DeepSeek**      | `deepseek-reasoner` | Suy luận phức tạp           |
+| **Google Gemini** | `gemini-2.5-flash`  | Nhanh, context 1M token     |
+| **Google Gemini** | `gemini-2.5-pro`    | Mạnh nhất của Google        |
+| **OpenAI**        | `gpt-4o`            | Nhận diện hình ảnh          |
+| **Groq**          | `llama-4-maverick`  | Inference siêu nhanh        |
+| **Ollama**        | `qwen3:14b`         | Local LLM offline           |
+
+```bash
+aichat                                 # Chat CLI - mặc định Gemini
+aichat -m deepseek:deepseek-chat       # Dùng DeepSeek
+aichat -f code.py                      # Chat về file code
+aichat --list-models                   # Danh sách model
+```
 
 ---
 
@@ -144,37 +176,19 @@ cp ~/.config/nixos/docs/templates/envrc .envrc
 devenv up      # Khởi động MySQL/Postgres
 ```
 
-Templates có sẵn: [PHP/Laravel](docs/templates/devenv-php.nix) · [Golang](docs/templates/devenv-go.nix) · [Vue 3](docs/templates/devenv-vue.nix)
-
----
-
-## 🤖 Zed Agent — Workflow Plan-First
-
-Mọi dự án đều có workflow **Refine → Plan → Confirm → Execute** cho AI Agent Panel:
-
-```bash
-initrule     # Copy .rules vào thư mục hiện tại
-```
-
-Rule template được deploy tự động qua Home Manager tại:
-- `~/.config/zed/rules/plan-first.md` — Template dùng chung
-- `~/.rules` — File rút gọn, dùng `initrule` để copy
-
-Để áp dụng **toàn cục** (không cần initrule cho từng dự án):
-1. Mở Agent Panel (`Ctrl+Shift+A`) → menu `...` → **Rules...**
-2. Nhấn `+` tạo rule mới → paste nội dung từ `~/.rules`
-3. Nhấn biểu tượng 📎 (paper clip) để đặt làm **default rule**
+Templates: [PHP/Laravel](docs/templates/devenv-php.nix) · [Golang](docs/templates/devenv-go.nix) · [Vue 3](docs/templates/devenv-vue.nix)
 
 ---
 
 ## 🐛 Sự cố thường gặp
 
-| Vấn đề | Giải pháp |
-|--------|-----------|
-| Bàn phím không hoạt động sau hibernate | Đã fix: `i8042` unbind/rebind |
-| Không có âm thanh | Đã fix: blacklist SOF → legacy HDA |
-| `nixd` lỗi trong Zed | `home` để cài `nixd` |
-| Build thất bại | `sudo nixos-rebuild switch --rollback` |
+| Vấn đề                                 | Giải pháp                                   |
+| -------------------------------------- | ------------------------------------------- |
+| Bàn phím không hoạt động sau hibernate | Đã fix: `i8042` unbind/rebind               |
+| Không có âm thanh                      | Đã fix: blacklist SOF → legacy HDA          |
+| `nixd` lỗi trong Zed                   | `home` để cài `nixd`                        |
+| Build thất bại                         | `sudo nixos-rebuild switch --rollback`      |
+| Locale build lâu                       | Đã fix: locale deferral (en_US → vi_VN sau) |
 
 ---
 

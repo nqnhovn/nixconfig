@@ -21,7 +21,7 @@
     boot.exec = "sudo nixos-rebuild boot --flake .#lg";
     gc.exec = "sudo nix-collect-garbage -d";
     update.exec = "nix flake update";
-    fmt.exec = "nixpkgs-fmt *.nix modules/**/*.nix home/**/*.nix hosts/**/*.nix";
+    fmt.exec = "nixpkgs-fmt flake/**/*.nix secrets/*.nix *.nix";
     list.exec = "sudo nix-env --list-generations -p /nix/var/nix/profiles/system";
     clean.exec = "sudo nix-collect-garbage -d && sudo nix-env --list-generations -p /nix/var/nix/profiles/system";
 

@@ -1,5 +1,11 @@
+# =====================================================================
+# FLAKE.NIX — ROOT ENTRY POINT (REDIRECTS TO FLAKE/FLAKE.NIX)
+# =====================================================================
+# Snowfall Lib structure: ./flake/ chứa toàn bộ modules, hosts, homes.
+# File này giữ inputs + redirect outputs sang ./flake/flake.nix
+
 {
-  description = "NixOS Flake Configuration for LG Gram 17";
+  description = "NixOS Snowfall Configuration — Multi-Host · Multi-Graphics";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -18,70 +24,9 @@
     devenv.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-generators, devenv, ... }@inputs:
+  outputs = args:
     let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
+      flakeOutputs = import ./flake/flake.nix;
     in
-    {
-      nixosConfigurations = {
-        lg = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./hosts/lg/default.nix
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "backup";
-              home-manager.users.nqnhovn = import ./home/default.nix;
-              system.configurationRevision = self.rev or "dirty";
-            }
-          ];
-        };
-      };
-
-
-      homeConfigurations = {
-        lg = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [
-            {
-              home = {
-                username = "nqnhovn";
-                homeDirectory = "/home/nqnhovn";
-                stateVersion = "25.11";
-              };
-            }
-            ./home/default.nix
-          ];
-          extraSpecialArgs = { inherit inputs; };
-        };
-      };
-
-      devShells.${system}.default = devenv.lib.mkShell {
-        inherit inputs pkgs;
-        modules = [
-          ({ ... }: { devenv.root = toString ./.; })
-          (import ./devenv.nix { inherit pkgs inputs; })
-        ];
-      };
-
-      packages.x86_64-linux.iso = nixos-generators.nixosGenerate {
-        system = "x86_64-linux";
-        format = "install-iso";
-        modules = [
-          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-gnome.nix"
-          ({ lib, ... }: {
-            nixpkgs.config.allowUnfree = true;
-            isoImage.editionName = lib.mkForce "standard-installer";
-            system.stateVersion = "25.11";
-          })
-        ];
-      };
-    };
+    flakeOutputs.outputs args;
 }

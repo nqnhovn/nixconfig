@@ -332,21 +332,19 @@ if [[ -z "${HOSTNAME:-}" ]]; then
     cp "$CONFIG_DIR/hosts/lg/default.nix" "$HOST_DIR/default.nix"
   else
     cat > "$HOST_DIR/default.nix" << 'NIXEOF'
-{ ... }:
+    { config, lib, ... }:
 
-{
-  imports = [
-    ./hardware.nix
-    ../../modules/system/core.nix
-    ../../modules/system/boot.nix
-    ../../modules/system/power.nix
-    ../../modules/system/display.nix
-    ../../modules/system/network.nix
-    ../../modules/system/services.nix
-    ../../modules/system/shell.nix
-  ];
-}
-NIXEOF
+    {
+      imports = [
+        ./hardware.nix
+        ../../../modules/nixos
+      ];
+
+      networking.hostName = lib.mkDefault "__HOSTNAME__";
+      flake.graphicsProfile = "headless";  # Sửa sau khi detect GPU
+      system.stateVersion = "25.11";
+    }
+    NIXEOF
   fi
   echo -e "  ${GREEN}Đã tạo hosts/$HOSTNAME/default.nix${NC}"
 
@@ -387,7 +385,7 @@ echo ""
 echo -e "${BOLD}[2/6] Cập nhật flake.nix...${NC}"
 FLAKE_FILE="$CONFIG_DIR/flake.nix"
 if [[ -f "$FLAKE_FILE" ]]; then
-  sed -i "s|./hosts/[^/]*/default.nix|./hosts/$HOSTNAME/default.nix|g" "$FLAKE_FILE"
+  sed -i "s|\./hosts/[^/]*/default\.nix|\./hosts/$HOSTNAME/default\.nix|g" "$FLAKE_FILE"
   echo -e "  ${GREEN}flake.nix → hosts/$HOSTNAME/default.nix${NC}"
 fi
 
@@ -475,7 +473,7 @@ else
 fi
 
 # ── Step 6: Cập nhật alias ────────────────────────────────────────────────
-SHELL_FILE="$CONFIG_DIR/modules/system/shell.nix"
+SHELL_FILE="$CONFIG_DIR/flake/modules/nixos/shell/default.nix"
 if [[ -f "$SHELL_FILE" ]]; then
   sed -i "s|--flake .\\\\#lg|--flake .\\\\#$HOSTNAME|g" "$SHELL_FILE"
   echo -e "  ${GREEN}Đã cập nhật alias → --flake .#$HOSTNAME${NC}"
