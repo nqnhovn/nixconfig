@@ -95,6 +95,7 @@
           format = format;
           modules = [
             ./modules/nixos/installer
+            ./modules/nixos/i18n
             {
               flake.installer.variant = variant;
               networking.hostName = lib.mkDefault "nixos-installer";
