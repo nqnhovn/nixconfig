@@ -6,7 +6,12 @@
 { pkgs, ... }:
 
 let
-  keys = import ../../../secrets/keys.nix;
+  # Fallback: nếu keys.nix không tồn tại (chưa tạo), dùng example
+  keysPath = ../secrets/keys.nix;
+  keysExamplePath = ../secrets/keys.example.nix;
+  keys = if builtins.pathExists keysPath
+    then import keysPath
+    else import keysExamplePath;
 in
 {
   xdg.configFile."aichat/config.yaml" = {
