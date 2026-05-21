@@ -6,7 +6,7 @@
 
 {
   imports = [
-    ../../../../modules/nixos
+    ../../modules/nixos
   ];
 
   networking.hostName = lib.mkDefault "nixos-vm";
