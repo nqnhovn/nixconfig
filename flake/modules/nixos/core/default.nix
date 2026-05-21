@@ -95,6 +95,7 @@
     gnomeExtensions.caffeine
     gnomeExtensions.appindicator
     devenv
+    nh  # nix-helper: quản lý generations, clean, search
   ];
 
   environment.gnome.excludePackages = with pkgs; [

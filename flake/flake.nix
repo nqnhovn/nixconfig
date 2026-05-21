@@ -89,16 +89,18 @@
       };
 
       # ── ISO builder ──────────────────────────────────────────────
-      mkISO = hostname: format: extraModules:
+      mkISO = hostname: format: variant: extraModules:
         nixos-generators.nixosGenerate {
           inherit system;
           format = format;
           modules = [
-            (./systems/${system}/${hostname})
-            ({ lib, ... }: {
-              nixpkgs.config.allowUnfree = true;
+            ./modules/nixos/installer
+            {
+              flake.installer.variant = variant;
+              flake.graphicsProfile = "headless";
+              networking.hostName = lib.mkDefault "nixos-installer";
               system.stateVersion = "25.11";
-            })
+            }
           ] ++ extraModules;
         };
 
@@ -131,25 +133,30 @@
 
       # ── Packages: ISO / VM images ────────────────────────────────
       packages.${system} = {
-        # Installer ISO với GNOME + Calamares (full installer)
-        iso-installer = mkISO "lg" "install-iso" [
+        # 🖥️  Installer ISO GNOME + Calamares + nh + App Store
+        iso-standard = mkISO "lg" "install-iso" "standard" [
           ("${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-gnome.nix")
-          ({ lib, ... }: {
-            isoImage.editionName = lib.mkForce "nixos-gnome-installer";
-          })
         ];
 
-        # ISO tối thiểu (không GUI, cho server/VPS)
-        iso-minimal = mkISO "vps" "iso" [ ];
+        # ⚡ ISO tối thiểu (server/headless, không GUI)
+        iso-minimal = mkISO "vps" "iso" "minimal" [
+          ("${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix")
+        ];
 
-        # VM image (qcow2 cho QEMU)
-        vm-qcow2 = mkISO "vm" "vm" [ ];
+        # 🖴 VM image (qcow2 cho QEMU/libvirt)
+        vm-qcow2 = mkISO "vm" "vm" "standard" [ ];
 
-        # VM image (VirtualBox)
-        vm-vbox = mkISO "vm" "virtualbox" [ ];
+        # 📦 VM image (OVA cho VirtualBox)
+        vm-vbox = mkISO "vm" "virtualbox" "standard" [ ];
 
-        # WSL image
-        wsl = mkISO "vps" "wsl" [ ];
+        # 🪟 WSL image
+        wsl = mkISO "vps" "wsl" "minimal" [ ];
+
+        # ☁️  Amazon EC2 image
+        amazon = mkISO "vps" "amazon" "minimal" [ ];
+
+        # 🐳 Docker / OCI container
+        docker = mkISO "vps" "docker" "minimal" [ ];
       };
     };
 }
