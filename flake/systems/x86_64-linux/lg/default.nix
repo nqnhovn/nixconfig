@@ -8,7 +8,7 @@
 {
   imports = [
     ./hardware.nix
-    ../../modules/nixos
+    ../../../modules/nixos
   ];
 
   # ── Host identity ─────────────────────────────────────────────────
