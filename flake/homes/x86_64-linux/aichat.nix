@@ -6,7 +6,7 @@
 { pkgs, ... }:
 
 let
-  keys = import ../secrets/keys.nix;
+  keys = import ../../../secrets/keys.nix;
 in
 {
   xdg.configFile."aichat/config.yaml" = {
