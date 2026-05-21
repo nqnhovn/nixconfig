@@ -391,18 +391,81 @@ if [[ -f "$FLAKE_FILE" ]]; then
   echo -e "  ${GREEN}flake.nix → hosts/$HOSTNAME/default.nix${NC}"
 fi
 
-# ── Step 3: Cài git + make ────────────────────────────────────────────────
+# ── Step 3: Thiết lập keys + GitHub SSH ──────────────────────────────────
 echo ""
-echo -e "${BOLD}[3/6] Cài đặt công cụ cơ bản...${NC}"
+echo -e "${BOLD}[3/7] Thiết lập keys & GitHub SSH...${NC}"
+
+KEYS_FILE="$CONFIG_DIR/secrets/keys.nix"
+KEYS_EXAMPLE="$CONFIG_DIR/secrets/keys.example.nix"
+
+# Tạo keys.nix từ example nếu chưa có
+if [[ ! -f "$KEYS_FILE" ]]; then
+  if [[ -f "$KEYS_EXAMPLE" ]]; then
+    cp "$KEYS_EXAMPLE" "$KEYS_FILE"
+    echo -e "  ${GREEN}Đã tạo secrets/keys.nix từ template${NC}"
+    echo -e "  ${YELLOW}⚠️  Hãy điền key thật vào secrets/keys.nix sau khi cài đặt!${NC}"
+  else
+    echo -e "  ${YELLOW}Không tìm thấy keys.example.nix, bỏ qua...${NC}"
+  fi
+else
+  echo -e "  ${GREEN}secrets/keys.nix đã tồn tại${NC}"
+fi
+
+# Hỏi GitHub SSH key
+if [[ -f "$KEYS_FILE" ]]; then
+  echo ""
+  echo -ne "  ${CYAN}Bạn có muốn thiết lập GitHub SSH key ngay? [y/N]: ${NC}"
+  read -r setup_ssh
+  if [[ "$setup_ssh" =~ ^[Yy]$ ]]; then
+    echo -e "  ${CYAN}Nhập đường dẫn tới SSH private key (vd: ~/.ssh/id_ed25519):${NC}"
+    echo -ne "  ${YELLOW}> ${NC}"
+    read -r ssh_key_path
+    ssh_key_path="${ssh_key_path/#\~/$REAL_HOME}"
+
+    if [[ -f "$ssh_key_path" ]]; then
+      SSH_KEY_CONTENT=$(cat "$ssh_key_path")
+      # Escape cho sed
+      ESCAPED_KEY=$(echo "$SSH_KEY_CONTENT" | sed ':a;N;$!ba;s/\n/\\n/g')
+      # Thay thế placeholder trong keys.nix
+      sed -i "/github.sshKey = ''/,/'';/c\\  github.sshKey = '''\\n$SSH_KEY_CONTENT\\n  ''';" "$KEYS_FILE"
+      echo -e "  ${GREEN}✅ Đã chèn GitHub SSH key vào secrets/keys.nix${NC}"
+
+      # Hỏi GitHub username/email nếu chưa có
+      CURRENT_USER=$(grep "github.user" "$KEYS_FILE" | grep -oP '= "[^"]*"' | head -1 | tr -d '= "' || echo "")
+      if [[ -z "$CURRENT_USER" || "$CURRENT_USER" == "your-github-username" ]]; then
+        echo -ne "  ${CYAN}GitHub username: ${NC}"
+        read -r gh_user
+        [[ -n "$gh_user" ]] && sed -i "s/github.user   = \"[^\"]*\"/github.user   = \"$gh_user\"/" "$KEYS_FILE"
+      fi
+      CURRENT_EMAIL=$(grep "github.email" "$KEYS_FILE" | grep -oP '= "[^"]*"' | head -1 | tr -d '= "' || echo "")
+      if [[ -z "$CURRENT_EMAIL" || "$CURRENT_EMAIL" == "your-email@example.com" ]]; then
+        echo -ne "  ${CYAN}GitHub email: ${NC}"
+        read -r gh_email
+        [[ -n "$gh_email" ]] && sed -i "s/github.email  = \"[^\"]*\"/github.email  = \"$gh_email\"/" "$KEYS_FILE"
+      fi
+
+      # Cấu hình git với key từ file
+      chmod 600 "$ssh_key_path" 2>/dev/null || true
+      echo -e "  ${GREEN}✅ SSH key đã sẵn sàng cho git operations${NC}"
+    else
+      echo -e "  ${RED}Không tìm thấy file: $ssh_key_path${NC}"
+    fi
+  fi
+fi
+
+# ── Step 4: Cài git + make ────────────────────────────────────────────────
+NEW_STEP=4
+echo ""
+echo -e "${BOLD}[$NEW_STEP/7] Cài đặt công cụ cơ bản...${NC}"
 if ! command -v git &>/dev/null; then
   echo -e "  ${YELLOW}Đang cài git...${NC}"
   nix profile install nixpkgs#git 2>/dev/null || nix-env -iA nixos.git 2>/dev/null || true
 fi
 command -v git &>/dev/null && echo -e "  ${GREEN}git: OK${NC}" || echo -e "  ${YELLOW}git: sẽ dùng từ nix-shell${NC}"
 
-# ── Step 4: Git init ──────────────────────────────────────────────────────
+# ── Step 5: Git init ──────────────────────────────────────────────────────
 echo ""
-echo -e "${BOLD}[4/6] Khởi tạo git repository...${NC}"
+echo -e "${BOLD}[5/7] Khởi tạo git repository...${NC}"
 if [[ ! -d "$CONFIG_DIR/.git" ]]; then
   cd "$CONFIG_DIR"
   git init && git add . && git commit -m "Initial: NixOS config for $HOSTNAME" --quiet
@@ -411,16 +474,16 @@ else
   echo -e "  ${GREEN}Git repo đã tồn tại${NC}"
 fi
 
-# ── Step 5: Cập nhật alias ────────────────────────────────────────────────
+# ── Step 6: Cập nhật alias ────────────────────────────────────────────────
 SHELL_FILE="$CONFIG_DIR/modules/system/shell.nix"
 if [[ -f "$SHELL_FILE" ]]; then
   sed -i "s|--flake .\\\\#lg|--flake .\\\\#$HOSTNAME|g" "$SHELL_FILE"
   echo -e "  ${GREEN}Đã cập nhật alias → --flake .#$HOSTNAME${NC}"
 fi
 
-# ── Step 6: Sửa quyền + chạy Makefile ─────────────────────────────────────
+# ── Step 7: Sửa quyền + hoàn tất ──────────────────────────────────────────
 echo ""
-echo -e "${BOLD}[6/6] Chuẩn bị & chạy Makefile...${NC}"
+echo -e "${BOLD}[7/7] Chuẩn bị & hoàn tất...${NC}"
 chown -R "$REAL_USER:users" "$CONFIG_DIR" 2>/dev/null || true
 chmod +x "$CONFIG_DIR/initial.sh" "$CONFIG_DIR/search.py" 2>/dev/null || true
 

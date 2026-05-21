@@ -8,10 +8,41 @@ RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
 echo -e "${YELLOW}🔍 Pre-commit: checking...${NC}"
 
 # ── 1. Check for secrets leakage ─────────────────────────────────
-if git diff --cached --name-only | grep -q "secrets/aichat-keys.nix"; then
-  echo -e "  ${RED}❌ BLOCKED: secrets/aichat-keys.nix is being committed!${NC}"
-  exit 1
-fi
+# Block TẤT CẢ secrets files trừ .example (skip staged deletions)
+SECRETS_BLOCKED=false
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+  # Bỏ qua nếu file đã bị xóa (staged delete)
+  if ! git diff --cached --diff-filter=D --name-only | grep -qFx "$f"; then
+    echo "skip delete $f" >/dev/null
+  else
+    continue
+  fi
+  # Cho phép .example.nix và .example
+  if [[ "$f" == *.example.nix ]] || [[ "$f" == *.example ]]; then
+    continue
+  fi
+  echo -e "  ${RED}❌ BLOCKED: $f contains secrets!${NC}"
+  echo -e "  ${YELLOW}   Chỉ file .example được phép commit.${NC}"
+  SECRETS_BLOCKED=true
+done < <(git diff --cached --name-only | grep -E '^secrets/' || true)
+if $SECRETS_BLOCKED; then exit 1; fi
+
+# Block key files & .pem anywhere in repo (trừ trong .example, skip deletions)
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+  # Bỏ qua nếu file đã bị xóa (staged delete)
+  if git diff --cached --diff-filter=D --name-only | grep -qFx "$f"; then
+    continue
+  fi
+  # Bỏ qua nếu là file .example
+  if [[ "$f" == *.example.nix ]] || [[ "$f" == *.example ]]; then
+    continue
+  fi
+  echo -e "  ${RED}❌ BLOCKED: $f looks like a secret file!${NC}"
+  SECRETS_BLOCKED=true
+done < <(git diff --cached --name-only | grep -E '(keys\.nix$|\.key$|\.pem$|credentials|secret)' || true)
+if $SECRETS_BLOCKED; then exit 1; fi
 
 # ── 2. Check for leftover merge conflicts ────────────────────────
 # Only match TRUE conflict markers (^<<<<<<< , ^=======$, ^>>>>>>> )

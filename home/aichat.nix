@@ -6,7 +6,7 @@
 { pkgs, ... }:
 
 let
-  keys = import ../secrets/aichat-keys.nix;
+  keys = import ../secrets/keys.nix;
 in
 {
   xdg.configFile."aichat/config.yaml" = {
@@ -27,6 +27,14 @@ in
 
       # ── Clients ─────────────────────────────────────────────────
       clients:
+        - name: openai
+          type: openai
+          api_base: https://api.openai.com/v1
+          api_key: ${keys.openai.key or ""}
+          models:
+            - name: gpt-4o
+            - name: gpt-4o-mini
+            - name: o1-preview
         - name: deepseek
           type: openai
           api_base: https://api.deepseek.com/v1
@@ -37,6 +45,18 @@ in
         - name: gemini
           type: gemini
           api_key: ${keys.gemini.key}
+        - name: groq
+          type: openai
+          api_base: https://api.groq.com/openai/v1
+          api_key: ${keys.groq.key or ""}
+          models:
+            - name: llama-4-maverick-17b-128e-instruct
+            - name: mixtral-8x7b-32768
+        - name: ollama
+          type: ollama
+          api_base: ${keys.ollama.url or "http://localhost:11434"}
+          models:
+            - name: ${keys.ollama.model or "qwen3:14b"}
 
       # ── RAG: 3 bộ tri thức ──────────────────────────────────────
       rags:

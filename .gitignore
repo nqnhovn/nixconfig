@@ -1,3 +1,4 @@
+# ── Devenv / Direnv ───────────────────────────────────────────────
 devbox.lock
 .direnv/
 .devenv/
@@ -12,5 +13,28 @@ __pycache__
 .env
 .env.local
 
-# RAG cache
+# ── Secrets ────────────────────────────────────────────────────────
+# TẤT CẢ key thật — CHỈ .example được tracked
+secrets/keys.nix
+secrets/aichat-keys.nix
+secrets/*-keys.nix
+*.key
+*.pem
+!*.example.nix
+!*.example
+
+# ── RAG cache ──────────────────────────────────────────────────────
 *.rag-cache/
+
+# ── Nix build artifacts ────────────────────────────────────────────
+result-*
+/nix/
+/nix/var/
+*.lock.chroot
+
+# ── IDE / Editor ───────────────────────────────────────────────────
+.zed/
+*.swp
+*.swo
+*~
+.DS_Store
