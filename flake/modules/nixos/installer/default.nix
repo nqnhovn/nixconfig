@@ -67,11 +67,6 @@ in
       services.gnome.gnome-software.enable = true;
 
       # Locale tiếng Việt cho installer
-      flake.i18n.targetLocale = "vi_VN.UTF-8";
-      flake.i18n.extraLocales = [ ];
-
-      # Calamares installer
-      services.calamares.enable = true;
 
       # NetworkManager cho WiFi trong installer
       networking.networkmanager.enable = true;
