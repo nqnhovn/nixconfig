@@ -2,10 +2,10 @@
 # MODULES/NIXOS/NETWORK — NETWORK, TIMEZONE, LOCALE
 # =====================================================================
 
-{ ... }:
+{ lib, ... }:
 
 {
-  networking.hostName = "lg";
+  networking.hostName = lib.mkDefault "lg";
   networking.networkmanager.enable = true;
   systemd.services.NetworkManager-wait-online.enable = false;
 
