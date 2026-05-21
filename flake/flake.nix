@@ -105,16 +105,16 @@
               };
               system.stateVersion = "25.11";
             }
-            # isoImage chỉ cho ISO formats (không VM/WSL/Docker)
-            (lib.mkIf (format == "install-iso" || format == "iso") {
-              isoImage = {
-                edition = if variant == "standard" then "gnome" else "minimal";
-                makeEfiBootable = true;
-                makeUsbBootable = true;
-              };
-            })
-          ] ++ extraModules;
-        };
+          ] ++ extraModules
+          # isoImage chỉ cho ISO formats (conditional via lib.optional)
+          ++ lib.optional (format == "install-iso" || format == "iso") {
+            isoImage = {
+              edition = if variant == "standard" then "gnome" else "minimal";
+              makeEfiBootable = true;
+              makeUsbBootable = true;
+            };
+          };
+      };
 
     in
     {
