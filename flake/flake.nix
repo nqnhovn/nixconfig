@@ -106,7 +106,7 @@
               system.stateVersion = "25.11";
             }
             # isoImage chỉ cho ISO formats (không VM/WSL/Docker)
-            ({ lib, ... }: lib.mkIf (builtins.elem format [ "install-iso" "iso" ]) {
+            (lib.mkIf (format == "install-iso" || format == "iso") {
               isoImage = {
                 edition = if variant == "standard" then "gnome" else "minimal";
                 makeEfiBootable = true;
