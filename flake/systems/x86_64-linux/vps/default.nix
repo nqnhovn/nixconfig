@@ -6,6 +6,7 @@
 
 {
   imports = [
+    ./hardware.nix
     ../../../modules/nixos
   ];
 

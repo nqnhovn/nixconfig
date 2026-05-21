@@ -6,10 +6,9 @@
 
 {
   imports = [
+    ./hardware.nix
     ../../../modules/nixos
   ];
-
-  networking.hostName = lib.mkDefault "nixos-vm";
   flake.graphicsProfile = "vm-guest";
 
   flake.i18n = {
