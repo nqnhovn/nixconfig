@@ -11,7 +11,6 @@
     ../../../modules/nixos
   ];
 
-  # ── Host identity ─────────────────────────────────────────────────
   networking.hostName = lib.mkDefault "lg";
   flake.graphicsProfile = "nvidia-prime";
 
