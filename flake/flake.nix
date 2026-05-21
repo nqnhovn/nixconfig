@@ -145,14 +145,14 @@
 
       # ── Packages: ISO / VM images ────────────────────────────────
       packages.${system} = {
-        # 🖥️  Installer ISO GNOME + Calamares + nh + App Store
+        # 🖥️  Installer ISO Standard — Desktop + WPS Office
         iso-standard = mkISO "lg" "install-iso" "standard" [
           ("${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-gnome.nix")
         ];
 
-        # ⚡ ISO tối thiểu (server/headless, không GUI)
-        iso-minimal = mkISO "vps" "iso" "minimal" [
-          ("${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix")
+        # 🛠️  Installer ISO Minidev — Developer tools
+        iso-minidev = mkISO "lg" "install-iso" "minidev" [
+          ("${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-gnome.nix")
         ];
 
         # 🖴 VM image (qcow2 cho QEMU/libvirt)
@@ -162,13 +162,13 @@
         vm-vbox = mkISO "vm" "virtualbox" "standard" [ ];
 
         # 🪟 WSL image
-        wsl = mkISO "vps" "wsl" "minimal" [ ];
+        wsl = mkISO "vps" "wsl" "minidev" [ ];
 
         # ☁️  Amazon EC2 image
-        amazon = mkISO "vps" "amazon" "minimal" [ ];
+        amazon = mkISO "vps" "amazon" "minidev" [ ];
 
         # 🐳 Docker / OCI container
-        docker = mkISO "vps" "docker" "minimal" [ ];
+        docker = mkISO "vps" "docker" "minidev" [ ];
       };
     };
 }

@@ -110,14 +110,29 @@ Dashboard TUI chuyên nghiệp quản lý generations:
 ## 📀 ISO Builds
 
 ```bash
-nix build .#iso-standard    # 🖥️  GNOME + Calamares + nh + App Store
-nix build .#iso-minimal     # ⚡ Server/headless
+nix build .#iso-standard    # 🖥️  Desktop + WPS Office + GNOME + Calamares
+nix build .#iso-minidev     # 🛠️  Developer (Go, Node, Python, Podman, Zed)
 nix build .#vm-qcow2        # 🖴 QEMU image
 nix build .#vm-vbox         # 📦 VirtualBox OVA
 nix build .#wsl             # 🪟 WSL image
 nix build .#amazon          # ☁️  EC2 image
 nix build .#docker          # 🐳 Docker container
 ```
+
+### 🚀 Post-install Setup Wizard
+
+Sau khi cài NixOS từ ISO, chạy:
+
+```bash
+nixos-setup
+```
+
+Wizard sẽ:
+
+1. 🔍 **Detect GPU** — tự chọn nvidia-prime / intel-only / headless
+2. 📦 **Chọn profile** — Standard / Developer / Office / Gaming / Minimal
+3. 🌐 **Chọn locale + input method** — fcitx5-unikey mặc định
+4. ⚙️ **Tạo config + rebuild** — tự động
 
 ---
 

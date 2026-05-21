@@ -76,6 +76,7 @@
       nhh = "nh home switch";  # Switch Home Manager
       nht = "nh os test";      # Test build
       nhb = "nh os boot";      # Build boot
+      nixos-setup = "bash ~/.config/nixos/scripts/nixos-setup.sh";  # Post-install wizard
       # ── Legacy scripts ────────────────────────────────────────
       build = "noglob f() { cd ~/.config/nixos && LABEL_SLUG=$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-') && TS=$(date +%y%m%d_%H%M%S) && git add . && git commit -m \"$1\" && sudo nixos-rebuild switch --flake .#lg && git push; }; f";
       sysupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d-%H%M)\"; fi; TS=$(date +%y%m%d_%H%M%S); sudo nixos-rebuild switch --flake .#lg && git push; }; f";
