@@ -2,99 +2,86 @@
 
 ## Mục đích
 
-Xác định tầm nhìn dài hạn của sản phẩm, giúp toàn đội hiểu rõ **tại sao** chúng ta xây dựng sản phẩm này và **hướng đến đâu**. Đây là kim chỉ nam cho mọi quyết định trong dự án.
+Xác định tầm nhìn dài hạn của sản phẩm. PlanAgent sẽ hỏi bạn 6 câu hỏi chiến lược khi khởi tạo dự án và tự động điền vào biểu mẫu này.
 
 ## Hướng dẫn điền
 
-- Trả lời ngắn gọn, súc tích từng mục.
-- Đảm bảo mọi thành viên trong nhóm đồng thuận với tầm nhìn này.
-- Cập nhật khi có thay đổi lớn về chiến lược sản phẩm.
+- Trả lời từng câu hỏi, PlanAgent sẽ tự điền.
+- Hoặc tự điền trực tiếp vào placeholder.
 
 ---
 
-## 1. Elevator Pitch
+## 1. Khởi tạo — 6 Câu hỏi chiến lược
 
-> **Dành cho** [đối tượng người dùng mục tiêu]
->
-> **Ai mà** [vấn đề / nỗi đau cần giải quyết]
->
-> **[Tên sản phẩm]** là một [danh mục sản phẩm]
->
-> **Mà** [lợi ích cốt lõi / giá trị khác biệt]
->
-> **Không giống như** [đối thủ cạnh tranh / giải pháp hiện tại]
->
-> **Sản phẩm của chúng tôi** [điểm khác biệt chính]
+> **PlanAgent sẽ hỏi tuần tự, bạn trả lời. Kết quả được điền tự động bên dưới.**
 
-### Elevator Pitch (đã điền)
+### #1 🎯 Mục tiêu — "Dự án này giải quyết vấn đề gì?"
 
-> **Dành cho** [điền tại đây]
->
-> **Ai mà** [điền tại đây]
->
-> **[điền tại đây]** là một [điền tại đây]
->
-> **Mà** [điền tại đây]
->
-> **Không giống như** [điền tại đây]
->
-> **Sản phẩm của chúng tôi** [điền tại đây]
+> [điền tại đây — vấn đề cốt lõi, nỗi đau của người dùng]
 
----
+### #2 👤 Người dùng — "Ai sẽ sử dụng sản phẩm này?"
 
-## 2. Mục tiêu kinh doanh (Business Goals)
+> [điền tại đây — persona chính: vai trò, mục tiêu, hành vi]
 
-| # | Mục tiêu | KPI đo lường | Giá trị mục tiêu | Thời hạn |
-|---|----------|-------------|-----------------|----------|
-| 1 | [điền tại đây] | [điền tại đây] | [điền tại đây] | [điền tại đây] |
-| 2 | [điền tại đây] | [điền tại đây] | [điền tại đây] | [điền tại đây] |
-| 3 | [điền tại đây] | [điền tại đây] | [điền tại đây] | [điền tại đây] |
+### #3 📦 Phạm vi MVP — "Phiên bản đầu tiên cần những tính năng gì?"
 
----
+| #   | Tính năng MUST HAVE | Giá trị        |
+| --- | ------------------- | -------------- |
+| 1   | [điền tại đây]      | [điền tại đây] |
+| 2   | [điền tại đây]      | [điền tại đây] |
+| 3   | [điền tại đây]      | [điền tại đây] |
+| 4   | [điền tại đây]      | [điền tại đây] |
+| 5   | [điền tại đây]      | [điền tại đây] |
 
-## 3. Người dùng mục tiêu (Target Users / Personas)
+### #4 🛠 Công nghệ — "Bạn muốn dùng stack nào?"
 
-### Persona 1
+| Lớp          | Công nghệ                            |
+| ------------ | ------------------------------------ |
+| **Frontend** | [điền, ví dụ: Vue 3 / React / HTMX]  |
+| **Backend**  | [điền, ví dụ: Go / Python / Rust]    |
+| **Database** | [điền, ví dụ: PostgreSQL / SQLite]   |
+| **Deploy**   | [điền, ví dụ: VPS / Fly.io / Vercel] |
 
-| Thuộc tính | Mô tả |
-|------------|-------|
-| **Tên** | [điền tại đây] |
-| **Vai trò** | [điền tại đây] |
-| **Mục tiêu** | [điền tại đây] |
-| **Nỗi đau** | [điền tại đây] |
-| **Hành vi** | [điền tại đây] |
+### #5 ⏱️ Timeline — "MVP cần hoàn thành trong bao lâu?"
 
-### Persona 2
+> [điền, ví dụ: 4 tuần → ~7 sprint (3-5 ngày/sprint)]
 
-| Thuộc tính | Mô tả |
-|------------|-------|
-| **Tên** | [điền tại đây] |
-| **Vai trò** | [điền tại đây] |
-| **Mục tiêu** | [điền tại đây] |
-| **Nỗi đau** | [điền tại đây] |
-| **Hành vi** | [điền tại đây] |
+### #6 ⭐ Ưu tiên — "Tính năng nào quan trọng nhất?"
+
+| Thứ tự | Tính năng      | Lý do ưu tiên  |
+| ------ | -------------- | -------------- |
+| 1      | [điền tại đây] | [điền tại đây] |
+| 2      | [điền tại đây] | [điền tại đây] |
+| 3      | [điền tại đây] | [điền tại đây] |
 
 ---
 
-## 4. Tính năng cốt lõi (Core Features)
+## 2. Elevator Pitch
 
-| # | Tính năng | Giá trị mang lại | Độ ưu tiên (1-5) |
-|---|-----------|-----------------|------------------|
-| 1 | [điền tại đây] | [điền tại đây] | [điền tại đây] |
-| 2 | [điền tại đây] | [điền tại đây] | [điền tại đây] |
-| 3 | [điền tại đây] | [điền tại đây] | [điền tại đây] |
-| 4 | [điền tại đây] | [điền tại đây] | [điền tại đây] |
-| 5 | [điền tại đây] | [điền tại đây] | [điền tại đây] |
+> **Dành cho** [đối tượng người dùng]
+> **Ai mà** [vấn đề cần giải quyết]
+> **[Tên sản phẩm]** là một [danh mục]
+> **Mà** [lợi ích cốt lõi]
+> **Không giống như** [giải pháp hiện tại]
+> **Sản phẩm của chúng tôi** [điểm khác biệt]
 
 ---
 
-## 5. Rủi ro & Giả định (Risks & Assumptions)
+## 3. Mục tiêu kinh doanh
 
-| # | Rủi ro / Giả định | Mức độ (Cao/Trung bình/Thấp) | Biện pháp giảm thiểu |
-|---|-------------------|------------------------------|---------------------|
-| 1 | [điền tại đây] | [điền tại đây] | [điền tại đây] |
-| 2 | [điền tại đây] | [điền tại đây] | [điền tại đây] |
-| 3 | [điền tại đây] | [điền tại đây] | [điền tại đây] |
+| #   | Mục tiêu       | KPI    | Target | Deadline |
+| --- | -------------- | ------ | ------ | -------- |
+| 1   | [điền tại đây] | [điền] | [điền] | [điền]   |
+| 2   | [điền tại đây] | [điền] | [điền] | [điền]   |
+
+---
+
+## 4. Rủi ro & Giả định
+
+| #   | Rủi ro | Mức độ      | Biện pháp |
+| --- | ------ | ----------- | --------- |
+| 1   | [điền] | Cao/TB/Thấp | [điền]    |
+| 2   | [điền] | Cao/TB/Thấp | [điền]    |
 
 ---
 
