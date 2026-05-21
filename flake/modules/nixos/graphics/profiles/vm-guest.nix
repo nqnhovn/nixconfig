@@ -21,7 +21,7 @@ in
     hardware.nvidia.prime.offload.enable = lib.mkForce false;
 
     # Tối ưu cho VM
-    services.xserver.displayManager.gdm.autoSuspend = false;
+    services.displayManager.gdm.autoSuspend = false;
 
     boot.kernelParams = [
       "console=tty0"

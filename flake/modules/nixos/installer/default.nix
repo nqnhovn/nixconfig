@@ -59,9 +59,9 @@ in
     (lib.mkIf (cfg.variant == "standard") {
       services.xserver = {
         enable = true;
-        displayManager.gdm.enable = true;
-        desktopManager.gnome.enable = true;
       };
+      services.displayManager.gdm.enable = true;
+      services.desktopManager.gnome.enable = true;
 
       # GNOME Software với nix backend
       services.gnome.gnome-software.enable = true;
@@ -71,25 +71,11 @@ in
       # NetworkManager cho WiFi trong installer
       networking.networkmanager.enable = true;
       networking.wireless.enable = lib.mkForce false;
-
-      # ISO metadata
-      isoImage = {
-        edition = "gnome";
-        volumeID = lib.mkForce "NIXOS_GNOME";
-        makeEfiBootable = true;
-        makeUsbBootable = true;
-      };
     })
 
     # ── Minimal: server / headless ─────────────────────────────
     (lib.mkIf (cfg.variant == "minimal") {
       services.xserver.enable = false;
-      isoImage = {
-        edition = "minimal";
-        volumeID = lib.mkForce "NIXOS_MINIMAL";
-        makeEfiBootable = true;
-        makeUsbBootable = true;
-      };
     })
   ];
 }
