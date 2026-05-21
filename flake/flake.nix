@@ -97,8 +97,11 @@
             ./modules/nixos/installer
             {
               flake.installer.variant = variant;
-              flake.graphicsProfile = "headless";
               networking.hostName = lib.mkDefault "nixos-installer";
+              fileSystems."/" = {
+                device = "/dev/root";
+                fsType = "tmpfs";
+              };
               system.stateVersion = "25.11";
             }
           ] ++ extraModules;
