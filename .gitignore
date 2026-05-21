@@ -15,6 +15,9 @@ __pycache__
 
 # ── Secrets ────────────────────────────────────────────────────────
 # TẤT CẢ key thật — CHỈ .example được tracked
+# info.nix: thông tin người dùng (gitUser, email, fullName)
+secrets/info.nix
+
 secrets/keys.nix
 secrets/aichat-keys.nix
 secrets/*-keys.nix

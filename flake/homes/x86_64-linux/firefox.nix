@@ -1,4 +1,16 @@
-{ config, ... }:
+{ config, lib, ... }:
+
+let
+  infoPath = ../../../../secrets/info.nix;
+  infoExamplePath = ../../../../secrets/info.example.nix;
+  userInfo = if builtins.pathExists infoPath
+    then import infoPath
+    else if builtins.pathExists infoExamplePath
+    then import infoExamplePath
+    else { };
+
+  userName = lib.toLower (userInfo.user or "nixos");
+in
 
 {
   programs.firefox = {
@@ -23,8 +35,8 @@
       };
     };
 
-    profiles.nqnhovn = {
-      id = 0; name = "nqnhovn"; isDefault = true;
+    profiles."${userName}" = {
+      id = 0; name = userName; isDefault = true;
       settings = {
         "browser.tabs.unloadOnLowMemory" = true;
         "browser.sessionhistory.max_total_viewers" = 0;

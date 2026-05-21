@@ -30,13 +30,13 @@ Git Push → GitHub Actions:
 
 ## Cấu hình VPS
 
-| Thuộc tính | Giá trị |
-|------------|---------|
-| **IP/Host** | `[điền VPS IP hoặc domain]` |
-| **User** | `[điền SSH user]` |
-| **Port** | `[điền SSH port, mặc định: 22]` |
+| Thuộc tính      | Giá trị                            |
+| --------------- | ---------------------------------- |
+| **IP/Host**     | `[điền VPS IP hoặc domain]`        |
+| **User**        | `[điền SSH user]`                  |
+| **Port**        | `[điền SSH port, mặc định: 22]`    |
 | **Deploy path** | `[điền đường dẫn deploy trên VPS]` |
-| **Auth** | SSH key (`~/.ssh/id_ed25519`) |
+| **Auth**        | SSH key (`~/.ssh/id_ed25519`)      |
 
 > **Chưa cấu hình VPS?** CicdAgent vẫn hoạt động với GitHub (push, release, actions) mà không cần VPS.
 
@@ -92,10 +92,10 @@ jobs:
 
 ## GitHub Secrets cần thiết
 
-| Secret | Mô tả |
-|--------|-------|
-| `VPS_HOST` | IP/domain VPS |
-| `VPS_USER` | SSH user |
+| Secret        | Mô tả           |
+| ------------- | --------------- |
+| `VPS_HOST`    | IP/domain VPS   |
+| `VPS_USER`    | SSH user        |
 | `VPS_SSH_KEY` | Private SSH key |
 
 > **Tạo secrets**: GitHub repo → Settings → Secrets and variables → Actions → New repository secret

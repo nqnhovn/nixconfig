@@ -8,20 +8,20 @@
 
 Hệ thống AI cá nhân tích hợp trong NixOS, gồm 3 lớp:
 
-| Lớp | Công nghệ | Vai trò |
-|------|-----------|---------|
-| **Client** | [Aichat](https://github.com/sigoden/aichat) v0.30 | Chat CLI đa năng, 20+ provider |
-| **RAG** ×3 | Document indexing | Kiến thức cá nhân, lập trình, sản xuất |
-| **Agent** ×3 | Role + RAG + Prompt | Trợ lý chuyên biệt từng lĩnh vực |
+| Lớp          | Công nghệ                                         | Vai trò                                |
+| ------------ | ------------------------------------------------- | -------------------------------------- |
+| **Client**   | [Aichat](https://github.com/sigoden/aichat) v0.30 | Chat CLI đa năng, 20+ provider         |
+| **RAG** ×3   | Document indexing                                 | Kiến thức cá nhân, lập trình, sản xuất |
+| **Agent** ×3 | Role + RAG + Prompt                               | Trợ lý chuyên biệt từng lĩnh vực       |
 
 ### Provider
 
-| Provider | Model | Loại | Dùng cho |
-|----------|-------|------|----------|
-| **Google Gemini** | `gemini-2.5-flash` | Free, nhanh | Chat hàng ngày, câu đơn giản |
-| **Google Gemini** | `gemini-2.5-pro` | Mạnh nhất | Phân tích phức tạp |
-| **DeepSeek** | `deepseek-chat` | Rẻ, tốt | Code, review, kỹ thuật |
-| **DeepSeek** | `deepseek-reasoner` | Suy luận | Bài toán khó, logic |
+| Provider          | Model               | Loại        | Dùng cho                     |
+| ----------------- | ------------------- | ----------- | ---------------------------- |
+| **Google Gemini** | `gemini-2.5-flash`  | Free, nhanh | Chat hàng ngày, câu đơn giản |
+| **Google Gemini** | `gemini-2.5-pro`    | Mạnh nhất   | Phân tích phức tạp           |
+| **DeepSeek**      | `deepseek-chat`     | Rẻ, tốt     | Code, review, kỹ thuật       |
+| **DeepSeek**      | `deepseek-reasoner` | Suy luận    | Bài toán khó, logic          |
 
 ---
 
@@ -48,13 +48,13 @@ ask "hello"                         # → gemini flash (ngắn)
 
 **Cơ chế tự động chọn model:**
 
-| Điều kiện | Model được chọn |
-|-----------|----------------|
-| Câu < 200 ký tự, thông thường | `gemini:gemini-2.5-flash` |
-| Chứa `code/fix/error/nix/python/bash/go/vue/debug` | `deepseek:deepseek-chat` |
-| Dài > 200 ký tự | `deepseek:deepseek-reasoner` |
-| Chứa `system/config/máy/laptop/generat/switch/boot/nixos` | Agent `general` + RAG |
-| Model chính lỗi (hết tiền, timeout) | Fallback → `gemini:gemini-2.5-flash` |
+| Điều kiện                                                 | Model được chọn                      |
+| --------------------------------------------------------- | ------------------------------------ |
+| Câu < 200 ký tự, thông thường                             | `gemini:gemini-2.5-flash`            |
+| Chứa `code/fix/error/nix/python/bash/go/vue/debug`        | `deepseek:deepseek-chat`             |
+| Dài > 200 ký tự                                           | `deepseek:deepseek-reasoner`         |
+| Chứa `system/config/máy/laptop/generat/switch/boot/nixos` | Agent `general` + RAG                |
+| Model chính lỗi (hết tiền, timeout)                       | Fallback → `gemini:gemini-2.5-flash` |
 
 ### Gọi nhanh Agent
 
@@ -99,6 +99,7 @@ a mes-erp       # Chuyên gia MES/ERP — tra RAG mes-erp
 ```
 
 **Nội dung:**
+
 - MES: Production Order, WIP Tracking, QC, OEE, Traceability
 - ERP: Finance, Procurement, Inventory, Sales, HR, Planning
 - Tích hợp MES-ERP: BOM, Routing, Work Center
@@ -115,9 +116,9 @@ Mỗi Agent = Role (prompt) + RAG (kiến thức) + Model (mặc định).
 ### Agent `general`
 
 ```yaml
-Model:  gemini:gemini-2.5-flash
-RAG:    general
-Alias:  a general
+Model: gemini:gemini-2.5-flash
+RAG: general
+Alias: a general
 ```
 
 Trợ lý tổng hợp, hiểu rõ hệ thống và thói quen của Nho.
@@ -125,9 +126,9 @@ Trợ lý tổng hợp, hiểu rõ hệ thống và thói quen của Nho.
 ### Agent `coding`
 
 ```yaml
-Model:  deepseek:deepseek-chat
-RAG:    coding
-Alias:  a coding
+Model: deepseek:deepseek-chat
+RAG: coding
+Alias: a coding
 ```
 
 Chuyên gia lập trình, tra cứu patterns và templates từ RAG.
@@ -135,9 +136,9 @@ Chuyên gia lập trình, tra cứu patterns và templates từ RAG.
 ### Agent `mes-erp`
 
 ```yaml
-Model:  deepseek:deepseek-chat
-RAG:    mes-erp
-Alias:  a mes-erp
+Model: deepseek:deepseek-chat
+RAG: mes-erp
+Alias: a mes-erp
 ```
 
 Chuyên gia MES/ERP, tư vấn kiến trúc hệ thống sản xuất.
@@ -204,17 +205,18 @@ Hệ thống AI được mở rộng với **Orchestrator** — một Meta-Agent
 ### Cách hoạt động
 
 **Orchestrator** (rule mặc định `plan-first.md`) tự động:
+
 1. Phân tích yêu cầu → nhận diện từ khóa dự án
 2. Xác định giai đoạn (0-5) + chọn vai trò (PlanAgent / DevAgent / DocAgent)
 3. Đảm nhận vai trò đó và thực hiện theo workflow Refine→Plan→Confirm→Execute
 
 ### 3 Agent
 
-| Agent | Vai trò | Kích hoạt khi người dùng nói về... |
-|-------|---------|-----------------------------------|
-| **PlanAgent** | PO + SM | dự án mới, sprint, backlog, daily, review, retro, lập kế hoạch |
-| **DevAgent** | Developer | code, sửa lỗi, thêm tính năng, refactor, task |
-| **DocAgent** | Writer | tài liệu, document, readme, changelog, api doc, tổng hợp |
+| Agent         | Vai trò   | Kích hoạt khi người dùng nói về...                             |
+| ------------- | --------- | -------------------------------------------------------------- |
+| **PlanAgent** | PO + SM   | dự án mới, sprint, backlog, daily, review, retro, lập kế hoạch |
+| **DevAgent**  | Developer | code, sửa lỗi, thêm tính năng, refactor, task                  |
+| **DocAgent**  | Writer    | tài liệu, document, readme, changelog, api doc, tổng hợp       |
 
 ### Cách dùng
 

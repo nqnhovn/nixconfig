@@ -17,8 +17,8 @@
 
   scripts = {
     # ── Core management scripts ──────────────────────────────────────
-    switch.exec = "sudo nixos-rebuild switch --flake .#lg";
-    boot.exec = "sudo nixos-rebuild boot --flake .#lg";
+    switch.exec = "sudo nixos-rebuild switch --flake .#$(hostname)";
+    boot.exec = "sudo nixos-rebuild boot --flake .#$(hostname)";
     gc.exec = "sudo nix-collect-garbage -d";
     update.exec = "nix flake update";
     fmt.exec = "nixpkgs-fmt flake/**/*.nix secrets/*.nix *.nix";
@@ -31,7 +31,7 @@
       if ! git diff --quiet || ! git diff --cached --quiet; then
         git add . && git commit -m "home: $(date +%Y-%m-%d-%H%M)"
       fi
-      home-manager switch --flake .#lg
+      home-manager switch --flake .#$(hostname)
       echo "✅ Home Manager rebuild complete!"
     '';
 
@@ -52,7 +52,7 @@
         clear
         echo -e "''${BOLD}''${CYAN}"
         echo "╔══════════════════════════════════════════════════════════════╗"
-        echo "║  ❄️  NIXOS GENERATION MANAGER — LG Gram 17                  ║"
+        echo "║  ❄️  NIXOS GENERATION MANAGER — $(hostname)                 ║"
         echo "╠══════════════════════════════════════════════════════════════╣"
         echo -e "''${NC}"
 
@@ -133,7 +133,7 @@
             git commit -m "$LABEL" || echo -e "  ''${DIM}(nothing to commit)''${NC}"
             TS=$(date +%y%m%d_%H%M%S)
             echo -e "  ''${YELLOW}🔨 Building: ''${BOLD}$LABEL_SLUG-$TS''${NC}"
-            sudo nixos-rebuild switch --flake .#lg
+            sudo nixos-rebuild switch --flake .#$(hostname)
             NEW_GEN=$(sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null | grep current | awk '{print $1}')
             echo "$NEW_GEN $LABEL_SLUG-$TS" >> ~/.config/nixos/.gen-labels
             echo -e "  ''${GREEN}✅ Build complete! Gen #$NEW_GEN''${NC}"
@@ -143,7 +143,7 @@
             if [ "''${PIN_CHOICE,,}" = "y" ] || [ "''${PIN_CHOICE,,}" = "yes" ]; then
               read -r -p "  📛 Profile name (default: $LABEL_SLUG): " PROFILE_NAME
               PROFILE_NAME=''${PROFILE_NAME:-$LABEL_SLUG}
-              sudo nixos-rebuild switch --flake .#lg --profile-name "$PROFILE_NAME"
+              sudo nixos-rebuild switch --flake .#$(hostname) --profile-name "$PROFILE_NAME"
               echo -e "  ''${GREEN}✅ Pinned as: ''${BOLD}$PROFILE_NAME''${NC}"
             fi
 

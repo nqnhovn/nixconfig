@@ -122,22 +122,19 @@ in
 
   # ── RAG Content: general/about.md ───────────────────────────────
   xdg.configFile."aichat/rags/general/about.md".text = ''
-    # Thông tin hệ thống — NixOS LG Gram 17
+    # Thông tin hệ thống — NixOS
 
-    ## Phần cứng
-    - **Máy**: LG Gram 17 (17U70N)
-    - **CPU**: Intel i5-10210U (Comet Lake, 4C/8T)
-    - **GPU**: Intel UHD Graphics + NVIDIA GTX 1650 (PRIME offload)
-    - **RAM**: 16GB DDR4
-    - **SSD**: NVMe
-
-    ## Phần mềm
-    - **OS**: NixOS 26.05 (Yarara)
-    - **DE**: GNOME 49 + Wayland
-    - **Editor**: Zed
+    ## Hệ điều hành
+    - **OS**: NixOS (Snowfall Lib, Flake-based)
+    - **DE**: GNOME + Wayland
     - **Shell**: Zsh + Starship
+
+    ## Công cụ phát triển
+    - **Editor**: Zed
+    - **Git**: lazygit, gh, delta, tig
     - **Container**: Podman + Distrobox
     - **Dev env**: Devenv + Direnv
+    - **Shell tools**: fzf, ripgrep, fd, bat, eza, jq
 
     ## AI Agent System
     - **Orchestrator**: Tự động chọn Agent dựa trên giai đoạn dự án

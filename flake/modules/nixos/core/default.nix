@@ -2,8 +2,21 @@
 # MODULES/NIXOS/CORE — USER, NIX SETTINGS, SYSTEM PACKAGES
 # =====================================================================
 
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
+let
+  # Đọc thông tin user từ secrets (fallback: example → mặc định)
+  userInfoPath = ../../../../secrets/info.nix;
+  userInfoExamplePath = ../../../../secrets/info.example.nix;
+  userInfo = if builtins.pathExists userInfoPath
+    then import userInfoPath
+    else if builtins.pathExists userInfoExamplePath
+    then import userInfoExamplePath
+    else { };
+
+  userName = lib.toLower (userInfo.user or "nixos");
+  fullName = userInfo.fullName or "NixOS User";
+in
 {
   # ── User ─────────────────────────────────────────────────────────────
   programs.nix-ld = {
@@ -61,9 +74,9 @@
     ];
   };
 
-  users.users.nqnhovn = {
+  users.users.${userName} = {
     isNormalUser = true;
-    description = "Nguyen Quoc Nho";
+    description = fullName;
     extraGroups = [ "networkmanager" "wheel" "docker" "podman" ];
     shell = pkgs.zsh;
   };
@@ -71,7 +84,7 @@
   # ── Nix settings ──────────────────────────────────────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
-  nix.settings.trusted-users = [ "root" "nqnhovn" ];
+  nix.settings.trusted-users = [ "root" userName ];
   nixpkgs.config.allowUnfree = true;
 
   nix.gc = {

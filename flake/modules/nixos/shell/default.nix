@@ -78,9 +78,9 @@
       nhb = "nh os boot";      # Build boot
       nixos-setup = "bash ~/.config/nixos/scripts/nixos-setup.sh";  # Post-install wizard
       # ── Legacy scripts ────────────────────────────────────────
-      build = "noglob f() { cd ~/.config/nixos && LABEL_SLUG=$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-') && TS=$(date +%y%m%d_%H%M%S) && git add . && git commit -m \"$1\" && sudo nixos-rebuild switch --flake .#lg && git push; }; f";
-      sysupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d-%H%M)\"; fi; TS=$(date +%y%m%d_%H%M%S); sudo nixos-rebuild switch --flake .#lg && git push; }; f";
-      appupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"home: $(date +%Y-%m-%d-%H%M)\"; fi; home-manager switch --flake .#lg; }; f";
+      build = "noglob f() { cd ~/.config/nixos && LABEL_SLUG=$(echo \"$1\" | tr '[:upper:]' '[:lower:]' | tr ' ' '-') && TS=$(date +%y%m%d_%H%M%S) && git add . && git commit -m \"$1\" && sudo nixos-rebuild switch --flake .#$(hostname) && git push; }; f";
+      sysupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"sysupdate: $(date +%Y-%m-%d-%H%M)\"; fi; TS=$(date +%y%m%d_%H%M%S); sudo nixos-rebuild switch --flake .#$(hostname) && git push; }; f";
+      appupdate = "f() { cd ~/.config/nixos; if ! git diff --quiet || ! git diff --cached --quiet; then git add . && git commit -m \"home: $(date +%Y-%m-%d-%H%M)\"; fi; home-manager switch --flake .#$(hostname); }; f";
       clean = "sudo nix-collect-garbage -d && sudo nix-env --list-generations -p /nix/var/nix/profiles/system";
       gen = "sudo nix-env --list-generations -p /nix/var/nix/profiles/system";
       ".." = "cd ..";

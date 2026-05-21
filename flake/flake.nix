@@ -50,10 +50,16 @@
         config.allowUnfree = true;
       };
 
-      # ── User config ──────────────────────────────────────────────
+      # ── User config (từ secrets/info.nix, fallback info.example.nix) ─
+      userInfoPath = ../secrets/info.nix;
+      userInfoExamplePath = ../secrets/info.example.nix;
+      userInfo = if builtins.pathExists userInfoPath
+        then import userInfoPath
+        else import userInfoExamplePath;
+
       user = {
-        name = "nqnhovn";
-        home = "/home/nqnhovn";
+        name = userInfo.user or "nixos";
+        home = userInfo.home or "/home/nixos";
       };
 
       # ── Home Manager module ──────────────────────────────────────

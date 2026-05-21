@@ -37,7 +37,7 @@ in
 
     # ── Input Method ─────────────────────────────────────────────
     inputMethod = lib.mkOption {
-      type = lib.types.enum [ "fcitx5-unikey" "fcitx5-mozc" "fcitx5-chinese" "none" ];
+      type = lib.types.enum [ "fcitx5-unikey" "fcitx5-mozc" "fcitx5-chinese" "fcitx5-english" "none" ];
       default = "fcitx5-unikey";
       description = "Bộ gõ mặc định trên ISO";
     };
@@ -100,6 +100,7 @@ in
           (if cfg.inputMethod == "fcitx5-unikey" then [ qt6Packages.fcitx5-unikey ]
            else if cfg.inputMethod == "fcitx5-mozc" then [ fcitx5-mozc ]
            else if cfg.inputMethod == "fcitx5-chinese" then [ fcitx5-chinese-addons ]
+           else if cfg.inputMethod == "fcitx5-english" then [ ]
            else [ ])
           ++ [ fcitx5-gtk fcitx5-table-extra ];
       };

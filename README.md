@@ -1,15 +1,15 @@
 # ❄️ NixOS Configuration — Snowfall Lib · Multi-Host
 
-**NixOS 26.05 · GNOME 49 + Wayland · Intel i5-10210U + NVIDIA GTX 1650**
+**Multi-Host · Multi-Graphics · Multi-Output (ISO/VM/WSL/Docker)**
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# Clone (hoặc tải ZIP) → extract vào ~/.config/nixos/
-sudo bash ~/.config/nixos/initial.sh   # Bootstrap: detect hardware + tạo host + cài git
-nixos                                     # Mở Dashboard quản lý generations
+# Dành cho máy mới cài NixOS:
+bash ~/.config/nixos/scripts/nixos-setup.sh   # Post-install wizard
+nixos                                             # Mở Dashboard quản lý generations
 ```
 
 ---
@@ -26,36 +26,32 @@ nixos                                     # Mở Dashboard quản lý generation
 ├── flake/                       # ❄️ Snowfall Lib core
 │   ├── flake.nix                # Main flake: mkHost, mkISO builders
 │   ├── lib/default.nix          # Helper library
-│   ├── modules/nixos/           # ⚙️ 8 domain modules
+│   ├── modules/nixos/           # ⚙️ 8 domain modules (generic)
 │   │   ├── core/                # User, Nix settings, system packages
 │   │   ├── boot/                # Bootloader, kernel, initrd, Plymouth
 │   │   ├── graphics/            # 🎨 4 profiles + GNOME desktop
-│   │   │   ├── profiles/        # intel-only, nvidia-prime, vm-guest, headless
-│   │   │   └── desktop/gnome.nix
-│   │   ├── power/               # 🔋 TLP, thermald, hibernate
+│   │   ├── power/               # 🔋 TLP, thermald, powertop
 │   │   ├── network/             # NetworkManager, timezone
 │   │   ├── services/            # Bluetooth, PipeWire, Podman, fcitx5
-│   │   ├── shell/               # Zsh, Starship, direnv, zoxide + nh aliases
+│   │   ├── shell/               # Zsh, Starship, direnv, zoxide
 │   │   ├── i18n/                # 🌐 Locale deferral system
-│   │   └── installer/           # 📀 ISO profiles (standard/minimal)
-│   ├── homes/x86_64-linux/      # 🏠 8 Home Manager modules
-│   ├── systems/x86_64-linux/    # 🖥️ 3 hosts
-│   │   ├── lg/                  # LG Gram 17 (nvidia-prime)
-│   │   ├── vm/                  # VM dev (vm-guest)
-│   │   └── vps/                 # VPS (headless)
+│   │   └── installer/           # 📀 ISO profiles (standard/minidev)
+│   ├── homes/x86_64-linux/      # 🏠 Home Manager modules
+│   ├── systems/x86_64-linux/    # 🖥️ Host-specific configs
 │   ├── overlays/
 │   └── packages/
 │
 ├── secrets/                     # 🔐 Key management
-│   ├── keys.example.nix         # Template (tracked)
+│   ├── info.example.nix         # User info template (tracked)
+│   ├── info.nix                 # User info thật (gitignored)
+│   ├── keys.example.nix         # API keys template (tracked)
 │   └── keys.nix                 # Key thật (gitignored)
 │
-├── docs/                        # 📚 Tài liệu
-│   ├── zed-agents/
-│   │   ├── plan/                # 📋 Scrum templates
 ├── scripts/                     # 🛠 Tiện ích
-├── devenv.nix                   # Dev environment
-└── initial.sh                   # Bootstrap
+│   ├── nixos-setup.sh           # Post-install wizard (5 bước)
+│   └── initproject.sh           # Khởi tạo dự án từ template
+├── docs/                        # 📚 Tài liệu
+└── devenv.nix                   # Dev environment
 ```
 
 ---
@@ -73,22 +69,15 @@ nho                 # Switch hệ thống (nh os switch)
 nhh                 # Switch Home Manager (nh home switch)
 nht                 # Test build (nh os test)
 nhb                 # Build boot (nh os boot)
-
-# ── Legacy ────────────────────────────────────────────────────
-switch            # devenv script: nixos-rebuild switch
-boot              # devenv script: build (không switch)
-home              # devenv script: rebuild user config
-gc                # Dọn rác nix store
-fmt               # Format code Nix
 ```
 
 ## 🖥️ Dashboard (nixos / dashboard)
 
-Dashboard TUI chuyên nghiệp quản lý generations:
+Dashboard TUI quản lý generations:
 
 - **B/b: Build** — Nhập Label → git add & commit → tạo gen → hỏi pin profile → git push
 - **D/d: Delete** — Nhập ID gen → xóa + GC
-- **S/s: Switch** — Rollback về gen bất kỳ + git checkout commit tương ứng
+- **S/s: Switch** — Rollback về gen bất kỳ
 - **H/h: Home** — Rebuild Home Manager
 - **C/c: Clean** — Xóa tất cả gen, chỉ giữ N gen gần nhất
 - **R/r: Reset** — Tạo profile mới, reset gen counter về 1
@@ -98,12 +87,12 @@ Dashboard TUI chuyên nghiệp quản lý generations:
 
 ## 🎨 Graphics Profiles
 
-| Profile        | GPU                              | Dùng cho                   |
-| -------------- | -------------------------------- | -------------------------- |
-| `nvidia-prime` | Intel UHD + NVIDIA PRIME offload | LG Gram, laptop hybrid     |
-| `intel-only`   | Intel UHD (tiết kiệm pin)        | Laptop trên pin, ultrabook |
-| `vm-guest`     | virtio-gpu                       | QEMU/VirtualBox guest      |
-| `headless`     | Không GPU                        | VPS, server                |
+| Profile        | GPU                               | Dùng cho              |
+| -------------- | --------------------------------- | --------------------- |
+| `nvidia-prime` | Intel iGPU + NVIDIA PRIME offload | Laptop hybrid         |
+| `intel-only`   | Intel UHD / AMD (modesetting)     | Laptop tiết kiệm pin  |
+| `vm-guest`     | virtio-gpu                        | QEMU/VirtualBox guest |
+| `headless`     | Không GPU                         | VPS, server           |
 
 ---
 
@@ -127,84 +116,47 @@ Sau khi cài NixOS từ ISO, chạy:
 nixos-setup
 ```
 
-Wizard sẽ:
+Wizard 5 bước:
 
-1. 🔍 **Detect GPU** — tự chọn nvidia-prime / intel-only / headless
-2. 📦 **Chọn profile** — Standard / Developer / Office / Gaming / Minimal
-3. 🌐 **Chọn locale + input method** — fcitx5-unikey mặc định
-4. ⚙️ **Tạo config + rebuild** — tự động
-
----
-
-## 🔋 Pin & Hiệu năng
-
-| Hạng mục           | Trên sạc      | Trên pin         |
-| ------------------ | ------------- | ---------------- |
-| CPU Governor       | `performance` | `powersave`      |
-| CPU Boost          | Bật           | **Tắt**          |
-| CPU Max            | 100%          | **60%**          |
-| Intel GPU          | Mặc định      | **300-650MHz**   |
-| NVMe               | Mặc định      | **lowest power** |
-| PCIe ASPM          | `default`     | `powersupersave` |
-| WiFi / USB / Sound | Tắt           | Powersave ON     |
-
-- **NVIDIA**: PRIME offload — GPU tắt khi không dùng
-- **Bluetooth**: KHÔNG tự bật khi khởi động
-- **Boot**: systemd-boot + systemd initrd + Plymouth (logo LG)
-- **Ngủ**: **Hibernate** (không suspend) — fix bàn phím LG Gram
-- **Âm thanh**: PipeWire + Legacy HDA (SOF driver blacklisted)
+1. 🔍 **Detect GPU** — tự chọn profile + lấy PCI bus IDs chính xác
+2. 📦 **Chọn profile** — Standard / Developer / Minimal
+3. 🌐 **Chọn locale + input method** — fcitx5-unikey / fcitx5-english / mozc / chinese
+4. ⚙️ **Tạo host config + rebuild**
+5. 🔑 **Thiết lập GitHub SSH key** (dành cho Developer profile)
 
 ---
 
-## 🤖 AI & LLM
+## 🔋 Pin & Hiệu năng (máy laptop)
 
-### Aichat
-
-Chat CLI đa năng, hỗ trợ 20+ provider:
-
-| Provider          | Model               | Dùng cho                    |
-| ----------------- | ------------------- | --------------------------- |
-| **DeepSeek**      | `deepseek-chat`     | Chat hàng ngày, code review |
-| **DeepSeek**      | `deepseek-reasoner` | Suy luận phức tạp           |
-| **Google Gemini** | `gemini-2.5-flash`  | Nhanh, context 1M token     |
-| **Google Gemini** | `gemini-2.5-pro`    | Mạnh nhất của Google        |
-| **OpenAI**        | `gpt-4o`            | Nhận diện hình ảnh          |
-| **Groq**          | `llama-4-maverick`  | Inference siêu nhanh        |
-| **Ollama**        | `qwen3:14b`         | Local LLM offline           |
-
-```bash
-aichat                                 # Chat CLI - mặc định Gemini
-aichat -m deepseek:deepseek-chat       # Dùng DeepSeek
-aichat -f code.py                      # Chat về file code
-aichat --list-models                   # Danh sách model
-```
+| Hạng mục        | Trên sạc      | Trên pin         |
+| --------------- | ------------- | ---------------- |
+| CPU Governor    | `performance` | `powersave`      |
+| CPU Boost       | Bật           | **Tắt**          |
+| PCIe ASPM       | `default`     | `powersupersave` |
+| NVMe            | Mặc định      | `lowest power`   |
+| USB Autosuspend | Tắt           | Bật              |
 
 ---
 
-## 🛠 Dev với Devenv
+## 🔧 Cấu hình máy mới
 
-Không cài PHP/Go/Node system-wide. Mỗi dự án có `devenv.nix`:
+1. **Copy secrets:**
 
-```bash
-mkdir my-project && cd my-project
-cp ~/.config/nixos/docs/templates/devenv-php.nix devenv.nix
-cp ~/.config/nixos/docs/templates/envrc .envrc
-devenv up      # Khởi động MySQL/Postgres
-```
+   ```bash
+   cp secrets/info.example.nix secrets/info.nix   # Điền user info
+   cp secrets/keys.example.nix secrets/keys.nix   # Điền API keys
+   ```
 
-Templates: [PHP/Laravel](docs/templates/devenv-php.nix) · [Golang](docs/templates/devenv-go.nix) · [Vue 3](docs/templates/devenv-vue.nix)
+2. **Chạy setup:**
 
----
+   ```bash
+   bash scripts/nixos-setup.sh
+   ```
 
-## 🐛 Sự cố thường gặp
-
-| Vấn đề                                 | Giải pháp                                   |
-| -------------------------------------- | ------------------------------------------- |
-| Bàn phím không hoạt động sau hibernate | Đã fix: `i8042` unbind/rebind               |
-| Không có âm thanh                      | Đã fix: blacklist SOF → legacy HDA          |
-| `nixd` lỗi trong Zed                   | `home` để cài `nixd`                        |
-| Build thất bại                         | `sudo nixos-rebuild switch --rollback`      |
-| Locale build lâu                       | Đã fix: locale deferral (en_US → vi_VN sau) |
+3. **Build:**
+   ```bash
+   sudo nixos-rebuild switch --flake .#<hostname>
+   ```
 
 ---
 
@@ -213,4 +165,6 @@ Templates: [PHP/Laravel](docs/templates/devenv-php.nix) · [Golang](docs/templat
 - [Khái niệm NixOS](docs/nixos-concepts.md)
 - [Devenv + Direnv](docs/devenv-direnv.md)
 - [Podman + Distrobox](docs/podman-distrobox.md)
+- [Aichat AI Setup](docs/aichat-setup.md)
+- [Zed AI Agent System](docs/zed-agent-system.md)
 - [Templates](docs/templates/)

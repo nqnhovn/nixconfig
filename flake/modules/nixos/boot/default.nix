@@ -1,6 +1,9 @@
 # =====================================================================
 # MODULES/NIXOS/BOOT — BOOTLOADER, KERNEL, INITRD, PLYMOUTH
 # =====================================================================
+# Module chung — generic cho mọi host.
+# Các tuỳ chỉnh dành riêng cho máy (resumeDevice, kernel params)
+# được đặt trong systems/<host>/default.nix.
 
 { lib, pkgs, ... }:
 
@@ -36,24 +39,13 @@
     theme = "bgrt";
   };
 
-  # ── Hibernate ─────────────────────────────────────────────────────────
-  boot.resumeDevice = "/dev/disk/by-uuid/4b931d72-02dd-4925-b788-042205a0e393";
-
-  # ── Kernel params ─────────────────────────────────────────────────────
+  # ── Kernel params chung ──────────────────────────────────────────────
   boot.kernelParams = [
     "quiet"
     "splash"
     "loglevel=3"
     "rd.systemd.show_status=false"
-    "snd-intel-dspcfg.dsp_driver=1"
     "nowatchdog"
-    "modprobe.blacklist=iTCO_wdt"
-    "modprobe.blacklist=snd_sof_pci_intel_cnl"
-    "i8042.nopnp=1"
-    "i8042.dumbkbd=1"
-    "i915.min_freq=300"
-    "i915.max_freq=650"
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
   ];
 
   # ── Timeout nhanh hơn ─────────────────────────────────────────────────
