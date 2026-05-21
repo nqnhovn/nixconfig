@@ -80,9 +80,9 @@ Các thiết lập mặc định toàn cục cho dự án. Khi người dùng kh
 
 ### Quy trình khởi tạo dự án mới từ template
 
-Thư mục `plan/` tại gốc dự án là **template gốc (golden template)** — KHÔNG sửa đổi trực tiếp. Khi khởi tạo một dự án mới:
+Thư mục `plan/` tại gốc dự án là **template gốc (golden template)** — KHÔNG sửa đổi trực tiếp. Template gốc nằm ở `docs/zed-agents/plan/`. Khi khởi tạo một dự án mới:
 
-1. **Copy** toàn bộ thư mục `plan/` từ template gốc sang thư mục dự án đích.
+1. **Copy** toàn bộ thư mục `plan/` từ `docs/zed-agents/plan/` sang thư mục dự án đích.
 2. **Giữ nguyên** cấu trúc thư mục và liên kết chéo giữa các file.
 3. **Điền** thông tin dự án cụ thể vào các placeholder `[điền tại đây]`.
 4. **Không** sửa nội dung template gốc — nếu cần cải tiến template, thực hiện trên bản gốc và cập nhật cho tất cả dự án.

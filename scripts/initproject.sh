@@ -12,7 +12,7 @@
 set -euo pipefail
 
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; NC='\033[0m'
-TEMPLATE_DIR="$HOME/.config/nixos/plan"
+TEMPLATE_DIR="$HOME/.config/nixos/docs/zed-agents/plan"
 
 # ── Validate ─────────────────────────────────────────────────────
 if [ $# -lt 1 ]; then

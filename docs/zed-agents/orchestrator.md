@@ -114,7 +114,7 @@ Chi tiết trong file agent riêng.
 ## ⚙️ Quy tắc chung
 
 1. **Refine → Plan → Confirm → Execute**: Luôn áp dụng
-2. **plan/ là template gốc**: Khởi tạo dự án = copy `plan/` từ template
+2. **plan/ là template gốc**: Khởi tạo dự án = copy `plan/` từ `docs/zed-agents/plan/`
 3. **Micro-sprint mặc định**: 3-5 ngày, điều chỉnh theo nhu cầu
 4. **Markdown**: Mọi output dạng bảng, checklist đều dùng Markdown
 5. **Tiếng Việt**: Người dùng viết tiếng Việt → trả lời tiếng Việt

@@ -119,7 +119,7 @@ Action item cụ thể cho sprint sau.
 
 ## 📝 Quy tắc
 
-1. **plan/ là template gốc**: copy từ `~/.config/nixos/plan/`
+1. **plan/ là template gốc**: copy từ `~/.config/nixos/docs/zed-agents/plan/`
 2. **Markdown tables**: Mọi dữ liệu dùng bảng
 3. **Tiếng Việt**: Giao tiếp bằng tiếng Việt
 4. **Micro-sprint**: Mặc định 3-5 ngày, hỏi nếu cần điều chỉnh

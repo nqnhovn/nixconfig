@@ -51,8 +51,9 @@ nixos                                     # Mở Dashboard quản lý generation
 │   └── keys.nix                 # Key thật (gitignored)
 │
 ├── docs/                        # 📚 Tài liệu
-├── scripts/                     # Tiện ích
-├── plan/                        # 📋 Scrum templates
+│   ├── zed-agents/
+│   │   ├── plan/                # 📋 Scrum templates
+├── scripts/                     # 🛠 Tiện ích
 ├── devenv.nix                   # Dev environment
 └── initial.sh                   # Bootstrap
 ```
