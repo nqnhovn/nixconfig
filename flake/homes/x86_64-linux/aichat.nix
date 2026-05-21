@@ -7,8 +7,8 @@
 
 let
   # Fallback: nếu keys.nix không tồn tại (chưa tạo), dùng example
-  keysPath = ../secrets/keys.nix;
-  keysExamplePath = ../secrets/keys.example.nix;
+  keysPath = ../../../secrets/keys.nix;
+  keysExamplePath = ../../../secrets/keys.example.nix;
   keys = if builtins.pathExists keysPath
     then import keysPath
     else import keysExamplePath;
